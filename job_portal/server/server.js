@@ -1,8 +1,9 @@
 import express from "express"
 import cors from "cors"
 import cookieParser from "cookie-parser"
-// import router from "./routes"
 import connectDB from "./config/db.js"
+import userRoute from "./routes/user.routes.js"
+
 import dotenv from "dotenv"
 dotenv.config({})
 
@@ -23,7 +24,7 @@ const corsOptions = {
 app.use(cors(corsOptions))
 
 // router setup
-// app.use("/api", router)
+app.use("/api", userRoute)
 
 
 const PORT = process.env.PORT || 3000

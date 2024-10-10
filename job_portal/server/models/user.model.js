@@ -27,12 +27,12 @@ const userSchema = new mongoose.Schema({
         skills:[{type:String}],
         resume:{type:String},
         resumeOriginName:{type:String},
-        company: {type:mongoose.Schema.Types.objectId, ref:'Company'},
+        company: {type:mongoose.Schema.Types.ObjectId, ref:'Company'},
         profilePhoto: {
             type:String,
             default: ""
         }
     },
 
-}, {timestamps:true});
-export const USer = mongoose.model("user", userSchema)
+});
+export const User = mongoose.model("user", userSchema)
