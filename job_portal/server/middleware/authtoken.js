@@ -1,28 +1,28 @@
 import jwt from "jsonwebtoken"
 
-export const authtoken = async (req, res, next) => {
+ const Authtoken = async (req, res, next) => {
     try {
-        const token = req.cookies?.token
+        const token = req.cookies.token
 
-        console.log("token", token)
+        // console.log("token", token)
 
         if(!token) {
-            return res.status(200).json({
+            return res.status(401).json({
 
                 message: "Please Login ....!",
                 error: true,
                 success: false
             })
         } else {
-            jwt.verify(token, process.env.TOKEN_SECRET_KEY, function(err, decoded) {
-                console.log(err)
+           jwt.verify(token, process.env.TOKEN_SECRET_KEY, function(err, decoded) {
+                // console.log(err)
                 // console.log("decoded", decoded)
                 
                 if(err){
                     console.log("error auth", err)
                 }
     
-                req.userId = decoded?._id
+                req.id = decoded.userId
     
                 next()
             })
@@ -37,3 +37,5 @@ export const authtoken = async (req, res, next) => {
         })
     }
 }
+
+export default Authtoken

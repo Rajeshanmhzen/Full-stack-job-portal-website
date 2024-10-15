@@ -19,7 +19,7 @@ export const login  = async(req, res) => {
             throw new Error("password mus contain atleast 7 char")
         }
 
-        const user = await User.findOne({email})
+        let user = await User.findOne({email})
 
        if(!user){
             throw new Error("User not found")
@@ -30,33 +30,31 @@ export const login  = async(req, res) => {
 
        const checkPassword = await bcrypt.compare(password,user.password)
 
-       if(checkPassword){
+
         const tokenData = {
-            _id : User._id,
-            fullname: User.fullname,
-            email : User.email,
-            password: User.password,
-            role: User.role,
-            phoneNumber: User.phoneNumber,
-            profile: User.profile,
-        }
-        const token = await jwt.sign(tokenData, process.env.TOKEN_SECRET_KEY, { expiresIn: '1d'});
-
-        const tokenOption = {
-            httpOnly : true,
-            secure : true,
+            userId : user._id,
         }
 
-        res.cookie("token",token,tokenOption).status(200).json({
+
+        const token =  jwt.sign(tokenData, process.env.TOKEN_SECRET_KEY, { expiresIn: '1d'});
+
+        user = {
+            _id: user._id,
+            fullname: user.fullname,
+            email: user.email,
+            phoneNumber: user.phoneNumber,
+            role: user.role,
+            profile: user.profile
+        }
+
+        res.cookie("token",token,{ maxAge: 1 * 24 * 60 * 60 * 1000, httpsOnly: true, sameSite: 'strict' }).status(200).json({
             message : `Welcome back ${user.fullname}`,
-            data : token,
+            user,
             success : true,
             error : false,
         })
 
-       }else{
-         throw new Error("Please check Password")
-       }
+       
    }catch(err){
         res.json({
             message : err.message || err  ,
