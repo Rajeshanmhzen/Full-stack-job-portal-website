@@ -3,6 +3,7 @@ import cors from "cors"
 import cookieParser from "cookie-parser"
 import connectDB from "./config/db.js"
 import userRoute from "./routes/user.routes.js"
+import companyRoute from "./routes/company.route.js"
 
 import dotenv from "dotenv"
 dotenv.config({})
@@ -26,12 +27,13 @@ app.use(cors(corsOptions))
 
 // router setup
 app.use("/api", userRoute)
+app.use("/api/company", companyRoute)
 
 
 const PORT = process.env.PORT || 3000
 connectDB().then(()=> {
     app.listen(PORT, ()=> {
         console.log("Connect to Database Successfully")
-        console.log(`Server is runneong at PORT: http://localhost:${PORT}`)
+        console.log(`Server is running at PORT: http://localhost:${PORT}`)
     });
 });
