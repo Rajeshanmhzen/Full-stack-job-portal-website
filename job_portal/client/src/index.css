@@ -1,68 +1,255 @@
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body,
+html {
+  width: 100%;
+  height: 100%;
+  background-color: #F2F4F7;
+}
+:root {
+  --bg-color: #2a2a2a;
+  --second-bg-color: #202020;
+  --third-bg-color: #000;
+  --second-text-color: #ccc;
+  --main-color: #ff4d05;
+  --text-color: #fff;
+  --big-font: 5rem;
+  --h1-font: 5.2rem;
+  --h2-font: 3.5rem;
+  --p-font: 1.1rem;
+}
+
+/* error pages */
+.err-page {
+  display: grid;
+  place-content: center;
+  width: 100%;
+  height: calc(100vh - 90px);
+  text-align: center;
+}
+.content p {
+  width: 500px;
+  margin-bottom: 8px;
+}
+
+/* end here */
+.btn {
   display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 10px 20px;
+  color: black;
+  text-decoration: none;
+  border: 1px solid var(--main-color);
+  border-radius: 50px;
   font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  font-size: 18px;
+  position: relative;
+  overflow: hidden;
+  transition: all ease 0.4s;
 }
 
-@media (prefers-color-scheme: light) {
+.btn::after {
+  content: "";
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-color: var(--main-color);
+  right: -100%;
+  top: 0;
+  border-radius: 50%;
+  transition: all ease 0.4s;
+}
+.btn:hover::after {
+  /* color: #ccc; */
+  right: 0;
+  border-radius: 0;
+}
+span {
+  transition: all ease 0.1s;
+  z-index: 1;
+}
+
+.navlinks a:hover {
+  color: var(--main-color);
+
+}
+
+.down-arrow {
+  font-size: 20px;
+  bottom: -7px;
+  right: -10px;
+}
+
+.view_profile:hover {
+ background-color: #d1d1d1;
+}
+
+.logout_profile:hover  {
+  background-color: #ffdfdf;
+  color: rgb(139, 14, 14);
+
+}
+
+.iconbtn {
+  font-size: 26px;
+  width: 17px;
+  height: 100%;
+  position: relative;
+}
+
+.iconbtn::after {
+  position: absolute;
+  content: "";
+  width: 50px;
+  height: 50px;
+  background-color: var(--main-color);
+  top: -11px;
+  right: -20px;
+  z-index: -1;
+  border-radius: 50%;
+}
+.padd-40 {
+  padding: 0 2.5rem;
+}
+@layer base {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
   }
-  a:hover {
-    color: #747bff;
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
   }
-  button {
-    background-color: #f9f9f9;
+}
+@layer base {
+  * {
+    @apply border-border;
   }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+
+/* form page */
+form .form-lists {
+  display: flex;
+  flex-direction: column;
+
+}
+.form-lists input[type="text"],
+ .form-lists input[type="email"], 
+ .form-lists input[type="tel"]   {
+  padding: 4px 12px;
+  height: 40px;
+}
+.form-lists input:hover {
+  outline: 2px solid var(--main-color);
+  border-radius: 3px;
+}
+.form-lists input:focus {
+  outline: 2px solid var(--main-color);
+  border-radius: 3px;
+}
+.radio-title-group {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.input-container {
+  position: relative;
+  height: 4rem;
+  width: 7rem;
+  margin: 0.5rem;
+}
+.input-container input {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+  z-index: 2;
+  opacity: 0;
+}
+
+.input-container .radio-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  border: 2px solid var(--main-color);
+  border-radius: 8px;
+  transition: all 300ms ease;
+}
+.input-container .radio-title label {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+input:checked+ .radio-title {
+  background-color: var(--main-color);
+  box-shadow: 0 0 12px var(--main-color);
+  color: white;
+  transform: scale(1.1);
+}
+
+input:hover+ .radio-title {
+  box-shadow: 0 0 8px var(--main-color);
 }

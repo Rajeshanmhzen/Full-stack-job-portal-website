@@ -1,6 +1,6 @@
 export const logout = async (req, res) => {
     try {
-        res.clearCookie("token")
+        res.clearCookie("token",{httpOnly:true})
 
         res.json({
             message : "Logout successfully",

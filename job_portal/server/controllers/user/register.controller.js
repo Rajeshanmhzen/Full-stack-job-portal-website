@@ -44,6 +44,7 @@ export const register = async(req, res) => {
 
         const userData = new User(payload)
         const saveUser = await userData.save();
+        saveUser.password = undefined
 
         res.status(201).json({
             data : saveUser,

@@ -14,7 +14,7 @@ applicant: {
 status: {
     type:String,
     enum: ['pending', 'accepted', 'rejected'],
-    default:pending
+    default:'pending'
 }
 }, {timestamps:true})
 

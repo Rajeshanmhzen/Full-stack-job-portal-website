@@ -24,10 +24,11 @@ const jobSchema = new mongoose.Schema({
         type:String,
         required: true
     },
-    jobType: {
-        type:String,
-        required:true
-    },
+    type: {
+        type: String,
+        enum: ['Full-time', 'Part-time', 'Contract', 'Internship', 'Remote'],
+        default: 'Full-time'
+      },
     position:{
         type:String,
         required:true
