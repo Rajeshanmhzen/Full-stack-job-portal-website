@@ -1,15 +1,17 @@
-import { Outlet } from "react-router-dom";
-import Navbar from "./Components/shared/NAvbar";
 
+import Header from './Components/shared/Header'
+
+import { Outlet } from 'react-router-dom';
 function App() {
+
   return (
     <>
-      <Navbar />
-      <main className="main">
-        <Outlet />
-      </main>
+    <div className='mx-20'>
+      <Header/>
+      <Outlet/>
+    </div>
     </>
-  );
+  )
 }
 
-export default App;
+export default App

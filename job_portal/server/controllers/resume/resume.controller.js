@@ -1,13 +1,14 @@
-// resume.controller.js
 import { Resume } from "../../models/resume.js";
 import { Job } from "../../models/job.model.js";
 import { 
   extractDetail, 
   extractTextFromDocx, 
-  extractTextFromPdf,
-  calculateSimilarity
-} from "./resumeParser.js";
+  extractTextFromPdf, 
+  calculateSimilarity 
+} from "../../utils/resumeParser.js";
+import  User  from "../../models/user.model.js";
 
+// Upload resume and parse the content
 export const uploadResume = async (req, res) => {
   try {
     if (!req.file) {
@@ -42,26 +43,18 @@ export const uploadResume = async (req, res) => {
 
     const details = extractDetail(extractedText);
     
-    const newResume = new Resume({
-      filename: req.file.originalname,
-      content: extractedText,
-      name: details.name,
-      email: details.email,
-      phone: details.phone,
-      location: details.location,
-      jobTitles: details.jobTitles,
-      skills: details.skills,
-      experience: details.experience
-    });
+    const resume = new Resume({...details, user:req.id})
+    await resume.save()
 
-    await newResume.save();
+    await User.findByIdAndUpdate(req.id, {resume:resume._id})
     
     // Get job recommendations
-    const recommendations = await getJobRecommendations(newResume);
+    const recommendations = await getJobRecommendations(resume);
 
     res.status(201).json({
       message: "Resume uploaded successfully!",
-      resume: newResume,
+      // resume: newResume,
+      resume: resume,
       recommendations,
       error: false,
       success: true

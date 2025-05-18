@@ -6,7 +6,7 @@ import userRoute from "./routes/user.routes.js"
 import companyRoute from "./routes/company.route.js"
 import JobRoute  from "./routes/job.route.js"
 import ApplicationRoute  from "./routes/application.route.js"
-// import resumeRoute  from "./routes/resume.route.js"
+import ResumeRoute  from "./routes/resume.route.js"
 
 import dotenv from "dotenv"
 dotenv.config({})
@@ -34,13 +34,12 @@ app.use("/api/v1/user", userRoute)
 app.use("/api/v1/company", companyRoute)
 app.use("/api/v1/job", JobRoute)
 app.use("/api/v1/application", ApplicationRoute)
-// app.use("/api/resume", resumeRoute)
+app.use("/api/v1/resume", ResumeRoute)
 
 
 const PORT = process.env.PORT || 3000
 connectDB().then(()=> {
     app.listen(PORT, ()=> {
-        console.log("Connect to Database Successfully")
         console.log(`Server is running at PORT: http://localhost:${PORT}`)
     });
 });

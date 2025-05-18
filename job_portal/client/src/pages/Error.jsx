@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import Button from '../Components/shared/button';
+
 
 const Error = () => {
   return (
@@ -16,7 +16,7 @@ const Error = () => {
                 </div>
                 <div className="flex items-center justify-center gap-8 my-9">
                     <NavLink to="/" className='btn-links'>
-                       <Button value="Return Home" />
+                       <button>Return Home</button>
                     </NavLink>
                     <NavLink to="/contact" className='text-xl text-white rounded-full bg-[#ff4d05] px-3 py-3'>
                         Report Problem

@@ -1,17 +1,12 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
-
-import Error from "../pages/Error";
-import Home from "../pages/Home";
-import Login from "../pages/Login";
+import Home from "../pages/Home"
 import Register from "../pages/Register";
-import Jobs from "../pages/jobs";
-import Browse from "../pages/Browse";
-import Forget_password from "@/pages/Forget_password";
-import ResetPassword from "@/pages/ResetPassword";
-
-
-
+import Login from "../pages/Login";
+import ForgotPassword from "../pages/Forgetpassword";
+import CodeVerification from "../pages/CodeVerification";
+import ResetPassword from "../pages/Resetpassword";
+import Error from "../pages/Error";
 
 const router = createBrowserRouter ([
     {
@@ -22,14 +17,7 @@ const router = createBrowserRouter ([
                 path:"",
                 element: <Home />
             },
-            {
-                path:"jobs",
-                element: <Jobs />
-            },
-            {
-                path:"browse",
-                element: <Browse />
-            },
+           
             {
                 path:"login",
                 element:<Login />
@@ -40,11 +28,15 @@ const router = createBrowserRouter ([
             },
             {
                 path: "forgot-password",
-                element: <Forget_password />,
+                element: <ForgotPassword />,
+              },
+              {
+                path: "verify-reset/:token",
+                element: <CodeVerification />,
               },
               
               {
-                path: "verify-reset-password",
+                path: "reset-password/:token",
                 element: <ResetPassword />,
               },
             {
