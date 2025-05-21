@@ -7,24 +7,32 @@ import {
   calculateSimilarity 
 } from "../../utils/resumeParser.js";
 import  User  from "../../models/user.model.js";
+import { fileURLToPath } from 'url';
+import path from 'path';
+import fs from 'fs';
 
-// Upload resume and parse the content
+
 export const uploadResume = async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({
-        message: "No file uploaded",
+        message: "No new file uploaded",
         success: false,
         error: true
       });
     }
 
+    const userId = req.id;
+    const newFilePath = req.file.path;
+    const newFilename = req.file.filename;
+    const mimeType = req.file.mimetype;
+
     let extractedText = "";
-    // Fix the typo in mimetype
-    if (req.file.mimetype === "application/pdf") {
-      extractedText = await extractTextFromPdf(req.file.path);
-    } else if (req.file.mimetype === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
-      extractedText = await extractTextFromDocx(req.file.path);
+
+    if (mimeType === "application/pdf") {
+      extractedText = await extractTextFromPdf(newFilePath);
+    } else if (mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+      extractedText = await extractTextFromDocx(newFilePath);
     } else {
       return res.status(400).json({
         message: "Unsupported file format",
@@ -41,29 +49,52 @@ export const uploadResume = async (req, res) => {
       });
     }
 
-    const details = extractDetail(extractedText);
-    
-    const resume = new Resume({...details, user:req.id})
-    await resume.save()
+    // Get previous resume
+    const user = await User.findById(userId).populate('resume');
+    const oldResume = user.resume;
 
-    await User.findByIdAndUpdate(req.id, {resume:resume._id})
-    
-    // Get job recommendations
-    const recommendations = await getJobRecommendations(resume);
+    // Delete old file from disk if it exists
+    if (oldResume?.filename) {
+      const __filename = fileURLToPath(import.meta.url);
+      const __dirname = path.dirname(__filename);
+      const oldFilePath = path.join(__dirname, '../../uploads/resumes', oldResume.filename);
 
-    res.status(201).json({
-      message: "Resume uploaded successfully!",
-      // resume: newResume,
-      resume: resume,
+      if (fs.existsSync(oldFilePath)) {
+        fs.unlinkSync(oldFilePath); // delete old resume file
+      }
+    }
+
+    const newDetails = extractDetail(extractedText, newFilename);
+
+    let updatedResume;
+
+    if (oldResume) {
+      updatedResume = await Resume.findByIdAndUpdate(
+        oldResume._id,
+        { ...newDetails, filename: newFilename },
+        { new: true }
+      );
+    } else {
+      updatedResume = new Resume({ ...newDetails, user: userId, filename: newFilename });
+      await updatedResume.save();
+      await User.findByIdAndUpdate(userId, { resume: updatedResume._id });
+    }
+
+    // Get fresh job recommendations
+    const recommendations = await getJobRecommendations(updatedResume);
+
+    res.status(200).json({
+      message: "Resume updated successfully!",
+      resume: updatedResume,
       recommendations,
-      error: false,
-      success: true
+      success: true,
+      error: false
     });
 
   } catch (error) {
-    console.error("Error uploading resume:", error);
+    console.error("Error updating resume:", error);
     res.status(500).json({
-      message: "Error uploading resume",
+      message: "Internal server error",
       error: true,
       success: false
     });
@@ -247,6 +278,73 @@ export const getAllResumes = async (req, res) => {
       message: "Error while fetching resumes",
       error: true,
       success: false
+    });
+  }
+};
+
+// Get resumes by specific user ID
+export const getResumesByUserID = async (req, res) => {
+  try {
+    const userId = req.id;
+
+    const userResumes = await Resume.find({ user: userId });
+
+    if (userResumes.length === 0) {
+      return res.status(404).json({
+        message: "No resumes found for this user",
+        error: true,
+        success: false
+      });
+    }
+
+    res.status(200).json({
+      resumes: userResumes,
+      count: userResumes.length,
+      success: true,
+      error: false
+    });
+
+  } catch (error) {
+    console.error("Error fetching resumes for user:", error);
+    res.status(500).json({
+      message: "Server error while fetching user's resumes",
+      error: true,
+      success: false
+    });
+  }
+};
+
+export const downloadResume = async (req, res) => {
+  try {
+    const resume = await Resume.findOne({ user: req.id });
+
+    if (!resume || !resume.filename) {
+      return res.status(404).json({
+        message: "Resume not found",
+        success: false,
+        error: true
+      });
+    }
+
+    const filePath = path.resolve("uploads/resumes", resume.filename);
+
+    res.download(filePath, resume.filename, (err) => {
+      if (err) {
+        console.error("Download error:", err);
+        return res.status(500).json({
+          message: "Error downloading resume",
+          success: false,
+          error: true
+        });
+      }
+    });
+
+  } catch (err) {
+    console.error("Error in downloadResume:", err);
+    res.status(500).json({
+      message: "Server error while downloading",
+      success: false,
+      error: true
     });
   }
 };

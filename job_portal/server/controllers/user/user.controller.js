@@ -108,7 +108,8 @@ export const login = async (req, res) => {
           const tokenData = {
               userId : user._id,
               email:user.email,
-              verifed:user.verified
+              verifed:user.verified,
+              role:user.role
           }
   
           const token =  await jwt.sign(tokenData, process.env.TOKEN_SECRET_KEY, { expiresIn: '1d'});
@@ -124,7 +125,7 @@ export const login = async (req, res) => {
   
           res.cookie("token", token, {
               maxAge: 1 * 24 * 60 * 60 * 1000,
-              httpsOnly: process.env.NODE_ENV === "production",
+              httpsOnly: true,
               secure: process.env.NODE_ENV === "production",
               sameSite: 'strict'
           }).status(200).json({
@@ -325,7 +326,7 @@ export const getUserDetail = async(req,res)=> {
 
     res.status(200).json({
       message: 'User retrieved successfully',
-      data: user,
+       user,
       error: false,
       success: true,
     });
@@ -399,7 +400,7 @@ export const changePassword = async (req, res) => {
 };
 export const logout = async (req, res) => {
   res.clearCookie("token");
-  res.send({ message: "Logout successfully" });
+  res.send({ message: "Logout successfully",success:true, error:false });
 };
 
 

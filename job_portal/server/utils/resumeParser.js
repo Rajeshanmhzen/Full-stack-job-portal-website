@@ -37,7 +37,7 @@ export const extractTextFromDocx = async (filePath) => {
 };
 
 // Resume Detail Extractor
-export const extractDetail = (text) => {
+export const extractDetail = (text, filename) => {
   if (!text) return {};
 
   const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
@@ -96,6 +96,8 @@ export const extractDetail = (text) => {
   });
 
   return {
+    filename,
+    content:text,
     name,
     email,
     phone,

@@ -1,49 +1,84 @@
+// src/routes/index.jsx
+
 import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
-import Home from "../pages/Home"
-import Register from "../pages/Register";
+
+// Public Pages
+import Home from "../pages/Home";
 import Login from "../pages/Login";
+import Register from "../pages/Register";
 import ForgotPassword from "../pages/Forgetpassword";
 import CodeVerification from "../pages/CodeVerification";
 import ResetPassword from "../pages/Resetpassword";
-import Error from "../pages/Error";
 
-const router = createBrowserRouter ([
-    {
-        path:"/",
-        element:<App />,
-        children:[
-            {
-                path:"",
-                element: <Home />
-            },
-           
-            {
-                path:"login",
-                element:<Login />
-            }, 
-            {
-                path:"register",
-                element:<Register />
-            },
-            {
-                path: "forgot-password",
-                element: <ForgotPassword />,
-              },
-              {
-                path: "verify-reset/:token",
-                element: <CodeVerification />,
-              },
-              
-              {
-                path: "reset-password/:token",
-                element: <ResetPassword />,
-              },
-            {
-                path: "*",
-                element: <Error/>
-            },
-        ]
-    }
-])
-export default router
+// Protected Pages (Role & Auth)
+import ChangePassword from "../pages/profile/ChangePassword";
+import JobHistory from "../pages/profile/JobHistory";
+import FindTalent from "../pages/FindTalent";
+
+// Route Guards
+import ProtectedRoute from "../Components/ProtectedRoute";
+import RoleProtectedRoute from "../Components/RoleProtectedRoute";
+import PostJobForm from "../Components/ui/PostJobForm";
+import Company from "../pages/Company";
+import CompanyDetail from "../Components/ui/CompanyDetail";
+
+// Fallback for route errors
+const RouteError = () => (
+  <div className="text-center mt-10 text-red-600 text-lg font-semibold">
+    ⚠️ Something went wrong while loading this page.
+  </div>
+);
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />,
+    errorElement: <Home/>,
+    children: [
+      //  Public routes
+      { index: true, element: <Home /> },
+      { path: "login", element: <Login /> },
+      { path: "register", element: <Register /> },
+      { path: "forgot-password", element: <ForgotPassword /> },
+      { path: "verify-reset/:token", element: <CodeVerification /> },
+      { path: "reset-password/:token", element: <ResetPassword /> },
+
+      //  Authenticated user route (any role)
+      {
+        element: <ProtectedRoute />, // Just checks if logged in
+        children: [
+          { path: "user/change-password", element: <ChangePassword /> },
+        ],
+      },
+
+      //  Recruiter-only routes
+      {
+        element: <RoleProtectedRoute allowedRoles={["recruiter"]} />,
+        children: [
+          { path: "find-talent", element: <FindTalent /> },
+          { path: "post-job", element: <PostJobForm /> },
+         {
+  path: "company",
+  children: [
+    { index: true, element: <Company /> }, 
+    { path: ":id", element: <CompanyDetail /> },
+  ]
+}
+        ],
+      },
+
+      //  Worker-only routes
+      {
+        element: <RoleProtectedRoute allowedRoles={["worker"]} />,
+        children: [
+          { path: "user/job-history", element: <JobHistory /> },
+        ],
+      },
+
+      { path: "*", element: <RouteError /> },
+    ],
+  },
+]);
+
+export default router;

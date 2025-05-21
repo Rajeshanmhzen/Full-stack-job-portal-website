@@ -1,9 +1,7 @@
 import express from "express"
-import {registerCompany} from "../controllers/company/register.controller.js"
-import { getCompany, getCompanyById } from "../controllers/company/getCompany.controller.js"
-
 import Authtoken from "../middleware/authtoken.js"
-import { updateCompany } from "../controllers/company/updateCompanyInfo.controller.js"
+import { getCompany, getCompanyById, registerCompany, searchCompaniesByname, updateCompany } from "../controllers/company/company.controller.js"
+import { uploadCompanyLogo } from "../middleware/fileUpload.js"
 
 
 const router = express.Router()
@@ -12,7 +10,8 @@ const router = express.Router()
 router.post('/register',Authtoken,registerCompany )
 router.get('/get',Authtoken,getCompany )
 router.get('/get/:id',Authtoken,getCompanyById )
-router.put('/update/:id',Authtoken, updateCompany )
+router.put('/update/:id',Authtoken,uploadCompanyLogo.single('company'), updateCompany )
+router.get('/search',Authtoken, searchCompaniesByname )
 
 
 export default router;

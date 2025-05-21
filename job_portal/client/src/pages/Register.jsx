@@ -3,15 +3,12 @@ import axios from "axios"
 import { Loader2 } from "lucide-react"
 import { useState } from "react"
 import { FaEye, FaEyeSlash,FaCheckCircle } from "react-icons/fa"
-import { useDispatch, useSelector } from "react-redux"
 import { Link, useNavigate } from "react-router-dom"
-import { setLoading } from "../store/userSlice"
 import { USER_API_END_POINT } from "../utils/constant"
 
 const Register = () => {
-  const {loading} = useSelector(store => store.auth)
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
   const [showPassword,setShowPassword] = useState(false)
   const [data , setData] = useState({
     fullname:"",
@@ -29,8 +26,7 @@ const Register = () => {
   });
   const handleInput = (e) => {
   setData({...data, [e.target.name]:e.target.value})
-  
-  }
+  };
 
   const validateForm = () => {
     const newErrors = {};
@@ -52,7 +48,6 @@ const Register = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
     const submitHandler = async(e) => {
       e.preventDefault();
       if (!validateForm()) {
@@ -60,6 +55,7 @@ const Register = () => {
     }
 
      try {
+      setLoading(true)
       const res = await axios.post(`${USER_API_END_POINT}/user/register`, data,{
         headers:{
          "Content-Type" : "application/json"
@@ -67,8 +63,6 @@ const Register = () => {
          withCredentials:true,
       })
       if(res.data.success) {
-
-        // toast.success(res.data.message)
         notifications.show({
           title:"Registered Successfully",
           message:"Redirecting to the login page...",
@@ -80,18 +74,17 @@ const Register = () => {
         setTimeout(() => {
           navigate('/login')
         }, 2000);
+        setLoading(false)
       }
       if(res.data.error) {
         // toast.error(res.data.message)
       }
+      
      } catch (error) {
       console.log(error)
       // toast.error(data.message)
      }
-     finally {
-         dispatch(setLoading(false))
-        }
-    }
+    };
       return (
     <>
     <form onSubmit={submitHandler} className="shadow-sm  flex flex-col justify-center items-center max-w-7xl mx-auto">
@@ -173,9 +166,9 @@ const Register = () => {
             ? 
             <button className="flex align-middle justify-center py-2 px-2 w-full my-4 bg-orange-600 text-white "><Loader2 className="animate-spin"/> Please Wait ...</button>
             :
-          <button type="submit" className="w-full my-4 bg-[#6A38C2] text-white text-lg py-2 px-2 rounded-sm hover: bg-[#743dd2]">Submit</button>
+          <button type="submit" className="w-full my-4 bg-purple-heart-700 text-white text-lg py-2 px-2 rounded-sm hover: bg-purple-heart-800">Submit</button>
           }
-        <span className="text-sm">Don't have an account? <Link to={"/login"} className="underline text-[#6A38C2] hover:text-[#743dd2]">Login</Link></span>
+        <span className="text-sm">Don't have an account? <Link to={"/login"} className="underline text-purple-heart-500 hover:text-purple-heart-600">Login</Link></span>
        </div>
 
       </div>

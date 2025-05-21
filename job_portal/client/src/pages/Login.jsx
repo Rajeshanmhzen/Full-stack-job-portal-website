@@ -1,44 +1,36 @@
-import { notifications } from "@mantine/notifications"
-import axios from "axios"
-import {  Loader2 } from "lucide-react"
-import { useState } from "react"
-import { FaCheckCircle, FaEye, FaEyeSlash } from "react-icons/fa"
-import { useDispatch, useSelector } from "react-redux"
-import { Link, useNavigate } from "react-router-dom"
-import { setLoading } from "../store/userSlice"
-import { USER_API_END_POINT } from "../utils/constant"
+import { notifications } from "@mantine/notifications";
+import axios from "axios";
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
+import { FaCheckCircle, FaEye, FaEyeSlash } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
+import { USER_API_END_POINT } from "../utils/constant";
+import { useDispatch } from "react-redux";
+import { setUser } from "../store/userSlice";
 
 
 const Login = () => {
-  const {loading} = useSelector(store => store.auth)
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [showPassword,setShowPassword] = useState(false)
-  const [data , setData] = useState({
-    email:"",
-    password:"",
-    role:""
-  })
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const [data, setData] = useState({
+    email: "",
+    password: "",
+    role: "",
+  });
+
   const [errors, setErrors] = useState({
     email: "",
     password: "",
-    role: ""
+    role: "",
   });
 
   const handleInput = (e) => {
     const { name, value } = e.target;
-
-    // Reset error for the specific field being changed
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      [name]: "" // Resetting the error for the changed field
-    }));
-
-    // Update input data state
-    setData((prevData) => ({
-      ...prevData,
-      [name]: value
-    }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
+    setData((prev) => ({ ...prev, [name]: value }));
   };
 
   const validateForm = () => {
@@ -47,7 +39,7 @@ const Login = () => {
       newErrors.email = "Please enter a valid email address.";
     }
     if (!data.password || data.password.length < 7) {
-      newErrors.password = "Password must contain at least 7 characters.";
+      newErrors.password = "Password must be at least 7 characters.";
     }
     if (!data.role) {
       newErrors.role = "Please select a role.";
@@ -56,54 +48,67 @@ const Login = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const submitHandler = async(e) => {
+   const submitHandler = async (e) => {
     e.preventDefault();
-    if (!validateForm()) {
-      return;
-    }
-   try {
-    dispatch(setLoading(true))
-    const res = await axios.post(`${USER_API_END_POINT}/user/login`, data,{
-      headers:{
-       "Content-Type" : "application/json"
-      },
-       withCredentials:true,
-    })
-    // console.log(res.data.success)
-    if(res.data.success) {
+    if (!validateForm()) return;
+
+    try {
+      setLoading(true);
+      const res = await axios.post(
+        `${USER_API_END_POINT}/user/login`,
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      if (res.data.success) {
+        dispatch(setUser(res.data.user));
+
+        // Optional: store role in localStorage if you need it on refresh
+        localStorage.setItem("userRole", res.data.user.role);
+
+        notifications.show({
+          title: "Login Successfully",
+          message: "Redirecting to the Home page...",
+          icon: <FaCheckCircle />,
+          color: "teal",
+          withBorder: true,
+          className: "!border-green-500",
+        });
+
+        setTimeout(() => navigate("/"), 1500);
+      } else {
+        notifications.show({
+          title: "Login Failed",
+          message: res.data.message || "Invalid credentials.",
+          color: "red",
+          withBorder: true,
+        });
+      }
+    } catch (error) {
+      console.error("Login error:", error);
       notifications.show({
-                title:"Registered Successfully",
-                message:"Redirecting to the login page...",
-                icon:<FaCheckCircle  />,
-                color:"teal",
-                withBorder:true,
-                className:"!border-green-500"
-              })
-      setTimeout(() => {
-        navigate('/')
-      }, 2000);
-    }else {
-      notifications.show({
-        title: "Login Failed",
-        message: res.data.message || "Invalid credentials or something went wrong.",
+        title: "Error",
+        message: "Something went wrong. Try again.",
         color: "red",
-        withBorder: true,
-        className: "!border-red-500",
       });
+    } finally {
+      setLoading(false);
     }
-    
-   } catch (error) {
-    console.log(error)
-   } finally {
-    dispatch(setLoading(false))
-   }
-  }
-    return (
-      <>
-      <form onSubmit={submitHandler} className="shadow-sm  flex flex-col justify-center items-center max-w-7xl mx-auto">
-        <div className="container w-1/2 shadow-md shadow-purple-heart-800 rounded-md p-4 my-10">
-          <h2 className="text-2xl font-semibold capitalize">Welcome back</h2>
-          <div className="radio-title-group">
+  };
+
+  return (
+    <form
+      onSubmit={submitHandler}
+      className="shadow-sm flex flex-col justify-center items-center max-w-7xl mx-auto"
+    >
+      <div className="container w-1/2 shadow-md rounded-md p-4 my-10">
+        <h2 className="text-2xl font-semibold">Welcome Back</h2>
+        <div className="radio-title-group">
           <div className="input-container">
             <input type="radio"
              id="recruiter"
@@ -130,54 +135,77 @@ const Login = () => {
   <span className="text-red-500 text-sm">{errors.role}</span>
 )}
         </div>
-         
-         <div className="form-container my-5 mx-8">
-          
-          <div className="form-lists my-2">
-           <label htmlFor="email">Email</label>
-           <input type="email" id="email" name="email" value={data.email} onChange={handleInput} placeholder="Enter your email" />
-           {errors.email && (
-              <span className="text-red-500 text-sm">{errors.email}</span>
-            )}
-          </div>
-          <div className="form-lists relative">
-              <label htmlFor="password">Password</label>
-              <input type={showPassword ? "text": "password" } id='password' className=' h-10 py-1 px-3' name='password' value={data.password} onChange={handleInput}  placeholder='Enter password'/>
-              <div className='passwordseen absolute bottom-2 right-4' onClick={()=>setShowPassword((prev)=>!prev)}>
-                  <span>
-                      {
-                          showPassword ? (
-                              <FaEyeSlash/>
-                          )
-                          :
-                          (
-                              <FaEye/>
-                          )
-                      }
-                  </span>
-              </div>
-          </div>
-                  {errors.password && (
-              <span className="text-red-500 text-sm">{errors.password}</span>
-            )}
-          <div className="text-right mt-2 underline underline-offset-8">
-            <Link to={"/forgot-password"} className=" ">Forget password</Link>
-          </div>
-          {
-            loading 
-            ? 
-            <button className="flex align-middle justify-center py-2 px-2 w-full my-4 bg-orange-600 text-white "><Loader2 className="animate-spin"/> Please Wait</button>
-            :
-          <button type="submit" className="w-full my-4 bg-purple-heart-700 text-white text-lg py-2 px-2 rounded-sm hover:bg-[#743dd2]">Submit</button>
-          }
-          <span className="text-sm"> Have an account? <Link to={"/register"} className="underline text-purple-heart-700 hover:text-purple-heart-600">Register</Link></span>
-         </div>
-  
+        <div className="form-lists my-2">
+          <label htmlFor="email">Email</label>
+          <input
+            type="email"
+            name="email"
+            value={data.email}
+            onChange={handleInput}
+            placeholder="Enter your email"
+            className="w-full px-3 py-2 border rounded"
+          />
+          {errors.email && (
+            <span className="text-red-500 text-sm">{errors.email}</span>
+          )}
         </div>
-      </form>
-  
-      </>
-    )
-}
+        <div className="form-lists relative my-2">
+          <label htmlFor="password">Password</label>
+          <input
+            type={showPassword ? "text" : "password"}
+            name="password"
+            value={data.password}
+            onChange={handleInput}
+            placeholder="Enter your password"
+            className="w-full px-3 py-2 border rounded"
+          />
+          <div
+            className="absolute bottom-3 right-4 cursor-pointer"
+            onClick={() => setShowPassword((prev) => !prev)}
+          >
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </div>
+          {errors.password && (
+            <span className="text-red-500 text-sm">{errors.password}</span>
+          )}
+        </div>
+        <div className="text-right my-2">
+          <Link
+            to="/forgot-password"
+            className="text-sm text-blue-500 hover:underline"
+          >
+            Forgot password?
+          </Link>
+        </div>
+        <div>
+          {loading ? (
+            <button
+              type="button"
+              className="w-full bg-purple-heart-700 text-white py-2 rounded flex justify-center items-center"
+            >
+              <Loader2 className="animate-spin mr-2" /> Please Wait...
+            </button>
+          ) : (
+            <button
+              type="submit"
+              className="w-full bg-purple-heart-700 text-white py-2 rounded hover:bg-purple-800"
+            >
+              Submit
+            </button>
+          )}
+        </div>
+        <p className="text-sm mt-2">
+          Don't have an account?{" "}
+          <Link
+            to="/register"
+            className="text-purple-700 underline hover:text-purple-600"
+          >
+            Register
+          </Link>
+        </p>
+      </div>
+    </form>
+  );
+};
 
-export default Login
+export default Login;

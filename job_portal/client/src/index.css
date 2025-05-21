@@ -29,8 +29,6 @@
 --color-purple-heart-900: #4c2a88;
 --color-purple-heart-950: #2f195c;
 
-
-
 /* Mine Shaft */
 --color-mine-shaft-50:  oklch(0.972 0.001 99.45);
 --color-mine-shaft-100: oklch(0.937 0.002 98.89);
@@ -43,6 +41,18 @@
 --color-mine-shaft-800: oklch(0.315 0.006 94.23);
 --color-mine-shaft-900: oklch(0.273 0.005 94.44);
 --color-mine-shaft-950: oklch(0.198 0.003 95.55);
+
+--color-pomegranate-50: #fff3f1;
+--color-pomegranate-100: #ffe4df;
+--color-pomegranate-200: #ffcfc5;
+--color-pomegranate-300: #ffad9d;
+--color-pomegranate-400: #ff7e65;
+--color-pomegranate-500: #fe5635;
+--color-pomegranate-600: #ee4b2b;
+--color-pomegranate-700: #c72c0e;
+--color-pomegranate-800: #a42810;
+--color-pomegranate-900: #882714;
+--color-pomegranate-950: #4a1005;
 
 }
 
