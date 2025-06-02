@@ -1,5 +1,5 @@
-
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
+import { SERVER_BASE_URL } from "../../utils/constant";
 
 const CompanyList = ({ companies = [], loading }) => {
   const navigate = useNavigate();
@@ -38,12 +38,9 @@ const CompanyList = ({ companies = [], loading }) => {
                 <tr key={company._id} className="hover:bg-gray-50 transition">
                   <td className="px-6 py-4">
                     <img
-                      src={
-                        company.logo ||
-                        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQqLBXiNFYnFqfs3t4mZvdP9BtJ7NtHYRSP2g&s"
-                      }
+                      src={`${SERVER_BASE_URL}/uploads/company-logos/${company.logo}`}
                       alt="Company Logo"
-                      className="w-10 h-10 object-cover"
+                      className="w-10 h-10 object-cover rounded"
                     />
                   </td>
                   <td className="px-6 py-4 font-medium">{company.name}</td>

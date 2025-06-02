@@ -1,57 +1,56 @@
 import { Job } from "../../models/job.model.js";
 
-export const postJob =async(req, res)=> {
-    try{
-        const {title, description, requirement,salary, jobType, experience, position,location, companyId} = req.body
+export const postJob = async(req, res) => {
+    try {
+        const {title, description, requirement, salary, jobType, experience, position, location, companyId} = req.body
         const userId = req.id;
-
-        if(!title){
+        
+        if(!title) {
             throw new Error("Please provide title")
-         }
-         if(!description){
+        }
+        if(!description) {
             throw new Error("Please provide description")
-         }
-         if(!requirement){
+        }
+        if(!requirement) {
             throw new Error("Please provide requirement")
-         }
-         if(!salary){
+        }
+        if(!salary) {
             throw new Error("Please provide salary")
-         }
-         if(!jobType){
+        }
+        if(!jobType) {
             throw new Error("Please provide jobType")
-         }
-         if(!experience){
+        }
+        if(!experience) {
             throw new Error("Please provide experience")
-         }
-         if(!position){
+        }
+        if(!position) {
             throw new Error("Please provide position")
-         }
-         
-         const job = await Job.create({
+        }
+        
+        const job = await Job.create({
             title, 
             description, 
-            requirement:requirement.split(","),
-            salary:Number(salary), 
-            jobType,
-            experienceLevel:experience,
+            requirement: requirement.split(","),
+            salary: Number(salary), 
+            type: jobType, 
+            experienceLevel: experience,
             position,
-            company:companyId,
+            company: companyId,
             location,
-            created_by:userId
-         })
-
-         return res.status(201).json({
-            message:"Job Created Successfully!",
+            created_by: userId
+        })
+        
+        return res.status(201).json({
+            message: "Job Created Successfully!",
             job,
-            error:false,
-            success:true
-         })
-
-    }catch(err){
-        res.status(404).json({
-            message : err.message || err  ,
-            error : true,
-            success : false,
+            error: false,
+            success: true
+        })
+    } catch(err) {
+        res.status(400).json({  // Changed from 404 to 400 for validation errors
+            message: err.message || err,
+            error: true,
+            success: false,
         })
     }
 }

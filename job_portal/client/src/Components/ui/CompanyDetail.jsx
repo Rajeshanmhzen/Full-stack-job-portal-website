@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import { COMPANY_API_END_POINT } from "../../utils/constant";
+import { COMPANY_API_END_POINT, SERVER_BASE_URL } from "../../utils/constant";
 import { notifications } from "@mantine/notifications";
-import { Button, Popover, TextInput, Textarea, Loader } from "@mantine/core";
+import { Button, Popover, TextInput, Textarea, Loader, FileInput } from "@mantine/core";
 import { IoMdArrowRoundBack } from "react-icons/io";
 
 const CompanyDetail = () => {
@@ -12,6 +12,7 @@ const CompanyDetail = () => {
   const [company, setCompany] = useState(null);
   const [popoverOpened, setPopoverOpened] = useState(false);
   const [formData, setFormData] = useState({
+    logo:"",
     name: "",
     email: "",
     website: "",
@@ -28,6 +29,7 @@ const CompanyDetail = () => {
       if (res.data.company) {
         setCompany(res.data.company);
         setFormData({
+          logo:res.data.company.logo || null,
           name: res.data.company.name || "",
           email: res.data.company.email || "",
           website: res.data.company.website || "",
@@ -51,6 +53,7 @@ const CompanyDetail = () => {
   const handleUpdate = async () => {
     try {
       setLoading(true);
+      
       const res = await axios.put(
         `${COMPANY_API_END_POINT}/update/${id}`,
         formData,
@@ -106,7 +109,8 @@ const CompanyDetail = () => {
                 </Button>
               </Popover.Target>
               <Popover.Dropdown>
-                <div className="flex flex-col gap-2">
+                <form className="flex flex-col gap-2">
+                  <FileInput clearable label="Upload company logo" placeholder="Upload logo" value={formData.logo}  onChange={(file)=> setFormData({...formData, logo:file})}/>
                   <TextInput
                     label="Name"
                     value={formData.name}
@@ -150,17 +154,14 @@ const CompanyDetail = () => {
                   >
                     {loading ? <Loader size="xs" /> : "Save Changes"}
                   </Button>
-                </div>
+                </form>
               </Popover.Dropdown>
             </Popover>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center sm:items-start space-x-0 sm:space-x-6 mt-7">
             <img
-              src={
-                company.logo ||
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQqLBXiNFYnFqfs3t4mZvdP9BtJ7NtHYRSP2g&s"
-              }
+              src={`${SERVER_BASE_URL}/uploads/company-logos/${company.logo}`}
               alt="Company Logo"
               className="w-20 h-20 object-cover rounded-full border"
             />

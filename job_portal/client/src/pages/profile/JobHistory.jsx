@@ -57,7 +57,7 @@ const JobHistory = () => {
   }, []);
 
   useEffect(() => {
-    setCurrentPage(1); // Reset to first page when tab changes
+    setCurrentPage(1);
   }, [activeTab]);
 
   const handleRemoveSavedJob = async (jobId) => {
@@ -145,7 +145,7 @@ const JobHistory = () => {
             {type === 'saved' && (
               <button
                 onClick={() => handleRemoveSavedJob(job._id)}
-                className="text-sm text-yellow-600 hover:underline"
+                className="text-sm text-yellow-600 hover:underline cursor-pointer"
               >
                 Remove
               </button>
@@ -173,7 +173,7 @@ const JobHistory = () => {
           <button
             key={tab.name}
             onClick={() => setActiveTab(tab.name)}
-            className={`px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200 ${
+            className={`px-4 py-2 rounded-full text-sm font-medium border cursor-pointer transition-all duration-200 ${
               activeTab === tab.name
                 ? 'bg-indigo-600 text-white border-indigo-600'
                 : 'bg-white text-gray-700 dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600'

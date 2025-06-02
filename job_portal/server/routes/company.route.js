@@ -10,7 +10,7 @@ const router = express.Router()
 router.post('/register',Authtoken,registerCompany )
 router.get('/get',Authtoken,getCompany )
 router.get('/get/:id',Authtoken,getCompanyById )
-router.put('/update/:id',Authtoken,uploadCompanyLogo.single('company'), updateCompany )
+router.put('/update/:id',Authtoken,uploadCompanyLogo.single('logo'), updateCompany )
 router.get('/search',Authtoken, searchCompaniesByname )
 
 

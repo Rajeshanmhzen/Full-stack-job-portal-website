@@ -22,13 +22,19 @@ import RoleProtectedRoute from "../Components/RoleProtectedRoute";
 import PostJobForm from "../Components/ui/PostJobForm";
 import Company from "../pages/Company";
 import CompanyDetail from "../Components/ui/CompanyDetail";
+import CompanyCreate from "../Components/ui/CompanyCreate";
+import AddCompanyDetails from "../Components/ui/AddCompanyDetails";
+import Jobs from "../pages/Jobs";
+import ResumeUpload from "../Components/ui/ResumeUpload";
+import Recommendation from "../Components/ui/Recommendation";
+import Error from "../pages/Error";
 
 // Fallback for route errors
-const RouteError = () => (
-  <div className="text-center mt-10 text-red-600 text-lg font-semibold">
-    ⚠️ Something went wrong while loading this page.
-  </div>
-);
+// const RouteError = () => (
+//   <div className="text-center mt-10 text-red-600 text-lg font-semibold">
+//     ⚠️ Something went wrong while loading this page.
+//   </div>
+// );
 
 const router = createBrowserRouter([
   {
@@ -38,6 +44,7 @@ const router = createBrowserRouter([
     children: [
       //  Public routes
       { index: true, element: <Home /> },
+      { path: "jobs", element: <Jobs /> },
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
       { path: "forgot-password", element: <ForgotPassword /> },
@@ -46,7 +53,7 @@ const router = createBrowserRouter([
 
       //  Authenticated user route (any role)
       {
-        element: <ProtectedRoute />, // Just checks if logged in
+        element: <ProtectedRoute />, 
         children: [
           { path: "user/change-password", element: <ChangePassword /> },
         ],
@@ -62,6 +69,8 @@ const router = createBrowserRouter([
   path: "company",
   children: [
     { index: true, element: <Company /> }, 
+    { path: "create/:id", element: <AddCompanyDetails /> },
+    { path: "create", element: <CompanyCreate /> },
     { path: ":id", element: <CompanyDetail /> },
   ]
 }
@@ -73,10 +82,12 @@ const router = createBrowserRouter([
         element: <RoleProtectedRoute allowedRoles={["worker"]} />,
         children: [
           { path: "user/job-history", element: <JobHistory /> },
+          { path: "user/upload-resume", element: <ResumeUpload /> },
+          { path: "user/recommendation", element: <Recommendation /> },
         ],
       },
 
-      { path: "*", element: <RouteError /> },
+      { path: "*", element: <Error /> },
     ],
   },
 ]);

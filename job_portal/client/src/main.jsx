@@ -9,10 +9,10 @@ import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 import '@mantine/carousel/styles.css';
 
-
 import { Notifications } from '@mantine/notifications'
-import store from './store/store.js'
+import store, { persistor } from './store/store.js'
 import AuthLoader from './Components/AuthLoader.jsx'
+import { PersistGate } from 'redux-persist/integration/react'
 
 const theme = createTheme({
   colors:{
@@ -32,12 +32,14 @@ const theme = createTheme({
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store={store}>
+      <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
      <MantineProvider defaultColorScheme='dark' theme={theme}>
       <Notifications position='top-right'/>
       <AuthLoader>
       <RouterProvider router={router} />
       </AuthLoader>
     </MantineProvider>
+    </PersistGate>
 </Provider>
   </StrictMode>,
 )

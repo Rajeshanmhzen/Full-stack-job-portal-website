@@ -28,6 +28,7 @@ const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   
+  
   const handleLogout = async () => {
     const res = await axios.get(`${USER_API_END_POINT}/user/logout`);
     if (res.data.success) {
@@ -55,28 +56,55 @@ const Header = () => {
     }
   };
 
+  const publicTabs = [
+  { name: "Home", key: "/", path: "/" },
+  { name: "About Us", key: "about-us", path: "/about" },
+  { name: "Jobs", key: "jobs", path: "/jobs" },
+];
+
+const workerTabs = [
+  ...publicTabs,
+ { name: "Recommdendations", key: "recommendations", path: "/user/recommendation" },
+];
+
+const recruiterTabs = [
+  ...publicTabs,
+   { name: "Find Talent", key: "find-talent", path: "/find-talent" },
+  { name: "Upload Jobs", key: "upload-jobs", path: "/post-job" },
+  { name: "Company", key: "company", path: "/company" },
+];
+
+const getTabsForRole = () => {
+  if (!user) return publicTabs;
+  if (user.role === "worker") return workerTabs;
+  if (user.role === "recruiter") return recruiterTabs;
+  return publicTabs;
+};
+
+const tabs = getTabsForRole();
+
   return (
+    
     <>
       <div className="flex items-center justify-between px-6 w-full h-20 text-white">
         <div className="font-semibold text-2xl">
           Job<span className=" text-[#6A38C2]">Hunt</span>
         </div>
         <div className="flex gap-3">
-          <NavLink
-            to={"/"}
-            className={({ isActive }) =>
-              isActive
-                ? "text-purple-heart-700 font-bold"
-                : "text-gray-700 hover:bg-gray-200 px-3 py-1 rounded"
-            }
-          >
-            Home
-          </NavLink>
-          <NavLink to={"/find-talent"}>Find Talent</NavLink>
-          <NavLink to={"/post-job"}>upload jobs</NavLink>
-          <NavLink to={"/"}>About us</NavLink>
-          <NavLink to={"/company"}>Company</NavLink>
-        </div>
+  {tabs.map((tab) => (
+    <NavLink
+      key={tab.key}
+      to={tab.path}
+      className={({ isActive }) =>
+        isActive
+          ? "text-purple-heart-700 font-bold underline underline-offset-4"
+          : "text-mine-shaft-300 hover:text-purple-heart-500 px-3 py-1 rounded"
+      }
+    >
+      {tab.name}
+    </NavLink>
+  ))}
+</div>
         {!user ? (
           <>
             <div>
@@ -84,8 +112,8 @@ const Header = () => {
                 <Link to={"/login"}>
                   <Button variant="default">Login</Button>
                 </Link>
-                <Link to={"/register"}>
-                  <Button rightSection={<FaArrowRight size={14} />}>
+                <Link to={"/register"} >
+                  <Button variant="filled" rightSection={<FaArrowRight size={14}  />} color="purple-heart.7">
                     Register for free
                   </Button>
                 </Link>
@@ -184,12 +212,17 @@ const Header = () => {
                             </Accordion.Panel>
                           </Accordion.Item>
                         </Accordion>
-
-                        <Button
+                           
+                           <div>
+                            {
+                              user.role === 'worker' ?(
+                                <>
+                                <Button
                           color="mine-shaft.6"
                           justify="space-between"
                           mt={"md"}
                           fullWidth
+                          onClick={()=> navigate("user/upload-resume")}
                           rightSection={<FaFileAlt size={21} />}
                         >
                           My Resume
@@ -213,6 +246,23 @@ const Header = () => {
                         >
                           Saved Jobs
                         </Button>
+                                </>
+                              ):(
+                                <>
+                                <Button
+                          color="mine-shaft.6"
+                          justify="space-between"
+                          mt={"md"}
+                          fullWidth
+                          rightSection={<FaHeart size={21} />}
+                        >
+                          Posted jobs
+                        </Button>
+                                </>
+                              )
+                            }
+                           </div>
+                        
                         <Button
                           color="mine-shaft.6"
                           justify="space-between"

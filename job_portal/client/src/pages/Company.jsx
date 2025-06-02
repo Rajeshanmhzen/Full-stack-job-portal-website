@@ -4,7 +4,10 @@ import { IoClose, IoLaptop } from "react-icons/io5";
 import CompanyList from '../Components/ui/CompanyList';
 import axios from 'axios';
 import { COMPANY_API_END_POINT } from '../utils/constant';
+import { useNavigate } from 'react-router-dom';
+
 const Company = () => {
+  const navigate = useNavigate()
     const [value, setValue] = useState('');
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -19,8 +22,6 @@ const Company = () => {
     const res = await axios.get(url, {
      withCredentials:true
     });
-    console.log( 'this for testting for search',searchName)
-
     if (res.data.companies) {
       setCompanies(res.data.companies);
     } else {
@@ -57,7 +58,7 @@ useEffect(() => {
             />
           }
         />
-        <Button leftSection={<IoLaptop size={14} />} variant="default">
+        <Button leftSection={<IoLaptop size={14} />} variant="default" onClick={()=> navigate("/company/create")}>
           New Company
         </Button>
       </div>

@@ -1,4 +1,6 @@
 import express from "express"
+import path from 'path';
+import { fileURLToPath } from 'url';
 import cors from "cors"
 import cookieParser from "cookie-parser"
 import connectDB from "./config/db.js"
@@ -28,6 +30,16 @@ const corsOptions = {
     allowedHeaders: ['Content-Type', 'Authorization']
 }
 app.use(cors(corsOptions))
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use('/uploads/company-logos', express.static(path.join(__dirname, 'uploads/company-logos')));
+
+// For resume files
+app.use('/uploads/resume-files', express.static(path.join(__dirname, 'uploads/resumes')));
+
+// For user profile pictures
+app.use('/uploads/profile-pic', express.static(path.join(__dirname, 'uploads/user-profiles')));
 
 // router setup
 app.use("/api/v1/user", userRoute)

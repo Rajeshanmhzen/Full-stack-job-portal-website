@@ -10,6 +10,7 @@ import  User  from "../../models/user.model.js";
 import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
+import { Recommendation } from "../../models/recommendation.model.js";
 
 
 export const uploadResume = async (req, res) => {
@@ -83,6 +84,16 @@ export const uploadResume = async (req, res) => {
     // Get fresh job recommendations
     const recommendations = await getJobRecommendations(updatedResume);
 
+    for(const r of recommendations) {
+      await Recommendation.create({
+        user:userId,
+        resume:updatedResume._id,
+        job:r.job._id,
+        score:r.score,
+        matchingReason:r.matchingReason
+      })
+    }
+    
     res.status(200).json({
       message: "Resume updated successfully!",
       resume: updatedResume,

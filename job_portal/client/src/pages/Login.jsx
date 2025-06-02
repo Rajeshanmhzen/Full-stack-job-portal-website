@@ -172,7 +172,7 @@ const Login = () => {
         <div className="text-right my-2">
           <Link
             to="/forgot-password"
-            className="text-sm text-blue-500 hover:underline"
+            className="text-sm text-purple-500  hover:underline"
           >
             Forgot password?
           </Link>
@@ -198,7 +198,7 @@ const Login = () => {
           Don't have an account?{" "}
           <Link
             to="/register"
-            className="text-purple-700 underline hover:text-purple-600"
+            className="text-purple-500 underline hover:text-purple-600"
           >
             Register
           </Link>

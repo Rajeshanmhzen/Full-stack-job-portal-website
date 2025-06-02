@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -70,7 +70,7 @@ export default function ForgotPassword() {
           </button>
         </form>
         <div className="mt-4 text-center">
-          <a href="/login" className="text-purple-heart-300 hover:underline">← Back to log in</a>
+          <Link to="/login" className="text-purple-heart-300 hover:underline">← Back to log in</Link>
         </div>
       </div>
     </div>
