@@ -1,0 +1,182 @@
+@import "tailwindcss";
+
+
+
+@theme {
+    /* Atlantis */
+--color-atlantis-50:  oklch(0.961 0.033 113.73);
+--color-atlantis-100: oklch(0.911 0.067 110.36);
+--color-atlantis-200: oklch(0.837 0.114 106.18);
+--color-atlantis-300: oklch(0.731 0.165 96.91);
+--color-atlantis-400: oklch(0.621 0.189 91.14);
+--color-atlantis-500: oklch(0.570 0.197 86.27);
+--color-atlantis-600: oklch(0.427 0.193 84.98);
+--color-atlantis-700: oklch(0.334 0.141 82.77);
+--color-atlantis-800: oklch(0.281 0.102 83.82);
+--color-atlantis-900: oklch(0.244 0.081 83.83);
+--color-atlantis-950: oklch(0.113 0.045 87.16);
+
+/* Purple Heart */
+--color-purple-heart-50: #f6f4fe;
+--color-purple-heart-100: #eeebfc;
+--color-purple-heart-200: #dfdafa;
+--color-purple-heart-300: #c6bdf5;
+--color-purple-heart-400: #ab97ee;
+--color-purple-heart-500: #8e6ce6;
+--color-purple-heart-600: #7d4dda;
+--color-purple-heart-700: #6a38c2;
+--color-purple-heart-800: #5b31a6;
+--color-purple-heart-900: #4c2a88;
+--color-purple-heart-950: #2f195c;
+
+/* Mine Shaft */
+--color-mine-shaft-50:  oklch(0.972 0.001 99.45);
+--color-mine-shaft-100: oklch(0.937 0.002 98.89);
+--color-mine-shaft-200: oklch(0.882 0.003 98.13);
+--color-mine-shaft-300: oklch(0.794 0.004 96.90);
+--color-mine-shaft-400: oklch(0.620 0.007 95.12);
+--color-mine-shaft-500: oklch(0.518 0.007 94.19);
+--color-mine-shaft-600: oklch(0.435 0.006 94.09);
+--color-mine-shaft-700: oklch(0.367 0.007 93.89);
+--color-mine-shaft-800: oklch(0.315 0.006 94.23);
+--color-mine-shaft-900: oklch(0.273 0.005 94.44);
+--color-mine-shaft-950: oklch(0.198 0.003 95.55);
+
+--color-pomegranate-50: #fff3f1;
+--color-pomegranate-100: #ffe4df;
+--color-pomegranate-200: #ffcfc5;
+--color-pomegranate-300: #ffad9d;
+--color-pomegranate-400: #ff7e65;
+--color-pomegranate-500: #fe5635;
+--color-pomegranate-600: #ee4b2b;
+--color-pomegranate-700: #c72c0e;
+--color-pomegranate-800: #a42810;
+--color-pomegranate-900: #882714;
+--color-pomegranate-950: #4a1005;
+
+}
+
+@layer utilities {
+  input:-webkit-autofill {
+    box-shadow: 0 0 0 1000px transparent inset !important; /* ← fake transparent background */
+    -webkit-text-fill-color: white !important;
+    caret-color: white;
+    transition: background-color 9999s ease-in-out 0s;
+  }
+}
+
+
+#root, html,body {
+    background-color: var(--color-mine-shaft-900);
+    color:var(--color-mine-shaft-50) ;
+}
+
+/* Theme variables */
+.dark {
+    --bg-primary: var(--color-mine-shaft-900);
+    --bg-secondary: var(--color-mine-shaft-800);
+    --bg-card: var(--color-mine-shaft-800);
+    --text-primary: var(--color-mine-shaft-50);
+    --text-secondary: var(--color-mine-shaft-300);
+    --border-color: var(--color-mine-shaft-700);
+    --header-bg: var(--color-mine-shaft-900);
+}
+
+.light {
+    --bg-primary: #f8fafc;
+    --bg-secondary: #ffffff;
+    --bg-card: #ffffff;
+    --text-primary: var(--color-mine-shaft-900);
+    --text-secondary: var(--color-mine-shaft-600);
+    --border-color: #e2e8f0;
+    --header-bg: #ffffff;
+}
+
+.theme-bg {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+.theme-card {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.theme-header {
+    background-color: var(--header-bg);
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* form page */
+form .form-lists {
+  display: flex;
+  flex-direction: column;
+
+}
+.form-lists input[type="text"],
+ .form-lists input[type="email"], 
+ .form-lists input[type="tel"]   {
+    outline: none;
+  padding: 4px 12px;
+  height: 40px;
+}
+.form-lists input:hover {
+  outline: 2px solid var(--color-purple-heart-700);
+  border-radius: 3px;
+}
+.form-lists input:focus {
+  /* outline: 2px solid var(--color-purple-heart-900); */
+  border-radius: 3px;
+}
+.radio-title-group {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.input-container {
+  position: relative;
+  height: 4rem;
+  width: 7rem;
+  margin: 0.5rem;
+}
+.input-container input {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+  z-index: 2;
+  opacity: 0;
+}
+
+.input-container .radio-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  border: 2px solid var(--color-purple-heart-700);
+  border-radius: 8px;
+  transition: all 300ms ease;
+}
+.input-container .radio-title label {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+input:checked+ .radio-title {
+  background-color: var(--color-purple-heart-700);
+  box-shadow: 0 0 12px var(--color-purple-heart-700);
+  color: white;
+  transform: scale(1.1);
+}
+
+input:hover+ .radio-title {
+  box-shadow: 0 0 8px var(--color-purple-heart-700);
+}
