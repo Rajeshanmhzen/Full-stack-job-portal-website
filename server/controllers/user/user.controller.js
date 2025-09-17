@@ -409,7 +409,7 @@ export const logout = async (req, res) => {
 };
 export const updateProfile = async (req, res) => {
   try {
-    const { fullname, email, phoneNumber, bio, skills } = req.body;
+    const { fullname, email, location, skills, experienceYears, experience, certifications } = req.body;
     const userId = req.id;
 
     let user = await User.findById(userId);
@@ -419,13 +419,16 @@ export const updateProfile = async (req, res) => {
 
     if (fullname) user.fullname = fullname;
     if (email) user.email = email;
-    if (phoneNumber) user.phoneNumber = phoneNumber;
-    if (bio) user.profile.bio = bio;
-    if (skills) user.profile.skills = skills.split(",");
-    if (req.file) user.profilePic = req.file.filename; // ← update profilePic
+    if (location) user.location = location;
+    if (skills) user.skills = Array.isArray(skills) ? skills : skills.split(",");
+    if (experienceYears) user.experienceYears = parseInt(experienceYears);
+    if (experience) user.experience = typeof experience === 'string' ? JSON.parse(experience) : experience;
+    if (certifications) user.certifications = typeof certifications === 'string' ? JSON.parse(certifications) : certifications;
+    if (req.file) user.profilePic = req.file.filename;
 
     await user.save();
-    await createNotification(userId, "Your profile was changed successfully")
+    await createNotification(userId, "Your profile was updated successfully");
+    
     res.status(200).json({
       message: "Profile updated successfully.",
       user: {
@@ -433,16 +436,22 @@ export const updateProfile = async (req, res) => {
         fullname: user.fullname,
         email: user.email,
         role: user.role,
-        phoneNumber: user.phoneNumber,
+        location: user.location,
+        skills: user.skills,
+        experienceYears: user.experienceYears,
         profilePic: user.profilePic,
+        experience: user.experience,
+        certifications: user.certifications
       },
       success: true,
+      error: false
     });
-    
   } catch (err) {
+    console.error("Profile update error:", err.message);
     res.status(500).json({
-      message: err.message || "Error updating user information",
+      message: "Internal server error.",
       success: false,
+      error: true
     });
   }
 };
@@ -501,36 +510,78 @@ export const searchCandidates = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-export const searchUsers = async(req,res)=> {
+export const searchUsers = async (req, res) => {
   try {
-    const {q} = req.query
-    if(!q || q.length < 2) {
-      return res.json({
-        success:true, users:[]
-      })
+    const { q, role, location, page = 1, limit = 10 } = req.query;
+    
+    if (!q || q.length < 2) {
+      return res.json({ success: true, users: [], total: 0 });
     }
-    // get alll user (exclude sensitive data)
-    const allUsers = await User.find({}, 'fullname email role location profilepic');
-    const resultResults = []
-    const searchTerm = q.toLowerCase();
 
-    // linear search implement
-    for(let i =0; i<allUsers.length; i++) {
-      const user = allUsers[i];
-      const nameMatch = user.fullname.toLowerCase().includes(searchTerm)
-      const roleMatch = user.role.toLowerCase().includes(searchTerm)
-      const locationMatch = user.location.toLowerCase().includes(searchTerm)
-      
-      if (nameMatch || roleMatch || locationMatch) {
-        searchResults.push(user);
-      }
-    }
-     res.json({ success: true, users: searchResults });
-  } catch (err) {
+    const searchQuery = {
+      $and: [
+        {
+          $or: [
+            { fullname: { $regex: q, $options: 'i' } },
+            { skills: { $regex: q, $options: 'i' } },
+            { location: { $regex: q, $options: 'i' } }
+          ]
+        },
+        role && { role },
+        location && { location: { $regex: location, $options: 'i' } },
+        { isVerified: true }
+      ].filter(Boolean)
+    };
+
+    const [users, total] = await Promise.all([
+      User.find(searchQuery)
+        .select('fullname email role profilePic location skills experienceYears')
+        .skip((page - 1) * limit)
+        .limit(parseInt(limit))
+        .sort({ fullname: 1 }),
+      User.countDocuments(searchQuery)
+    ]);
+
     res.json({
-      message: err.message || err,
-      error: true,
+      success: true,
+      users,
+      total,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / limit)
+    });
+  } catch (error) {
+    console.error('Error searching users:', error);
+    res.status(500).json({
       success: false,
+      message: 'Error searching users'
     });
   }
-}
+};
+
+export const getUserProfile = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    const user = await User.findById(userId)
+      .select('-password -failedAttempts -lockUntil')
+      .populate('resume', 'skills experience education');
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      user
+    });
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching user profile'
+    });
+  }
+};

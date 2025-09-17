@@ -89,8 +89,8 @@ const Header = () => {
   };
   const publicTabs = [
     { name: "Home", key: "/", path: "/" },
-    { name: "About Us", key: "about-us", path: "/about" },
     { name: "Jobs", key: "jobs", path: "/jobs" },
+    { name: "Find People", key: "search-users", path: "/search-users" },
   ];
   const workerTabs = [
     ...publicTabs,
@@ -223,7 +223,6 @@ const Header = () => {
                                 fullWidth
                                 rightSection={<FaFileAlt size={21} />}
                                 onClick={() => navigate("/user/view-profile")}
-
                               >
                                 View Profile
                               </Button>
@@ -233,8 +232,17 @@ const Header = () => {
                                 mt="xs"
                                 fullWidth
                                 rightSection={<FaFileAlt size={21} />}
+                                onClick={() => navigate("/user/edit-profile")}
+                              >
+                                Edit Profile
+                              </Button>
+                              <Button
+                                color="mine-shaft.6"
+                                justify="space-between"
+                                mt="xs"
+                                fullWidth
+                                rightSection={<FaFileAlt size={21} />}
                                 onClick={() => navigate("/user/change-password")}
-
                               >
                                 Change Password
                               </Button>

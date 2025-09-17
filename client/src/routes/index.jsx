@@ -24,6 +24,8 @@ import RoleProtectedRoute from "./RoleBasedRoute"
 import Company from "../pages/Company";
 import UploadResume from "../pages/UploadResume";
 import PublicProfile from "../features/users/PublicProfile";
+import UserSearch from "../features/users/UserSearch";
+
 import ApplicationManagement from "../features/applications/ApplicationManagement";
 import ApplicationDetails from "../features/applications/ApplicationDetails";
 import Recommendations from "../pages/Recommendations";
@@ -38,6 +40,7 @@ const router = createBrowserRouter([
       //  Public routes
       { index: true, element: <Home /> },
       { path: "jobs", element: <Jobs /> },
+      { path: "search-users", element: <UserSearch /> },
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
       { path: "forgot-password", element: <ForgotPassword /> },
@@ -52,6 +55,7 @@ const router = createBrowserRouter([
           { path: "user/change-password", element: <ChangePassword /> },
           { path: "user/view-profile", element: <UserProfile /> },
           { path: "user/profile", element: <Profile /> },
+
         ],
       },
 

@@ -12,6 +12,7 @@ import {
   getUserDetail,
   updateProfile,
   searchUsers,
+  getUserProfile,
 } from "../controllers/user/user.controller.js";
 
 import Authtoken from "../middleware/authtoken.js";
@@ -33,5 +34,6 @@ router.post("/resetpassword/:token", resetPassword);
 router.post("/resendverification", resendVerification);
 router.get("/verify", verifyEmail);
 router.get("/search", searchUsers);
+router.get("/profile/:userId", getUserProfile);
 
 export default router;
