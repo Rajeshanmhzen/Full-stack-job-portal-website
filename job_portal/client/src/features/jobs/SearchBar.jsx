@@ -1,4 +1,4 @@
-import MultiInput from './multiInput'
+import MultiInput from './MultiInput'
 import { dropdownData } from '../../constants/JobData'
 
 const Searchbar = () => {
