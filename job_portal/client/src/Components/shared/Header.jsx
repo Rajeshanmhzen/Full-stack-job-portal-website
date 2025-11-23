@@ -226,16 +226,7 @@ const Header = () => {
                               >
                                 View Profile
                               </Button>
-                              <Button
-                                color="mine-shaft.6"
-                                justify="space-between"
-                                mt="xs"
-                                fullWidth
-                                rightSection={<FaFileAlt size={21} />}
-                                onClick={() => navigate("/user/edit-profile")}
-                              >
-                                Edit Profile
-                              </Button>
+
                               <Button
                                 color="mine-shaft.6"
                                 justify="space-between"
