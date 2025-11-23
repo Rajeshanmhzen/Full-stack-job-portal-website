@@ -2,7 +2,7 @@
 import { Button, Card, Avatar, Badge } from "@mantine/core";
 import { MdLocationOn, MdWork, MdDownload, MdEdit, MdEmail, MdPhone } from "react-icons/md";
 import { FaLinkedin, FaGithub, FaGlobe } from "react-icons/fa";
-import { RESUME_API_END_POINT } from "../../utils/constant";
+import { RESUME_API_END_POINT, SERVER_BASE_URL } from "../../utils/constant";
 
 const UserProfile = () => {
   // Mock data for design preview
@@ -53,7 +53,7 @@ const UserProfile = () => {
             <div className="px-6 pb-6">
               <div className="relative -mt-12 mb-4">
                 <Avatar
-                  src={mockUser?.profilePic ? `http://localhost:5000/uploads/user-profiles/${mockUser.profilePic}` : null}
+                  src={mockUser?.profilePic ? `${SERVER_BASE_URL}/uploads/user-profiles/${mockUser.profilePic}` : null}
                   size={96}
                   className="border-4 border-white dark:border-gray-800 mx-auto"
                 />
