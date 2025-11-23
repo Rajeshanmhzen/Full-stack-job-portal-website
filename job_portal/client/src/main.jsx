@@ -11,7 +11,7 @@ import '@mantine/carousel/styles.css';
 
 import { Notifications } from '@mantine/notifications'
 import store, { persistor } from './store/store.js'
-import AuthLoader from './Components/AuthLoader.jsx'
+import AuthLoader from './components/AuthLoader.jsx'
 import { PersistGate } from 'redux-persist/integration/react'
 
 const theme = createTheme({
