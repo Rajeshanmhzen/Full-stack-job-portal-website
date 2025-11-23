@@ -1,6 +1,6 @@
-import Footer from './components/shared/Footer';
-import Header from './components/shared/Header'
-import ErrorBoundary from './components/shared/ErrorBoundary';
+import Footer from './components/shared/Footer.jsx';
+import Header from './components/shared/Header.jsx';
+import ErrorBoundary from './components/shared/ErrorBoundary.jsx';
 import useGetAllNotifications from './hooks/useGetAllNotifications';
 import { ThemeProvider } from './contexts/ThemeContext';
 
