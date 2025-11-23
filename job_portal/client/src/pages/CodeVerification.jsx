@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios"
+import { USER_API_END_POINT } from "../utils/constant";
 export default function CodeVerification() {
    const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [message, setMessage] = useState("");
@@ -35,7 +36,7 @@ export default function CodeVerification() {
     
     try {
       const response = await axios.post(
-        `http://localhost:8081/api/v1/user/verify-reset/${token}`,
+        `${USER_API_END_POINT}/verify-reset/${token}`,
         { otp: fullOtp }
       );
       
@@ -63,7 +64,7 @@ export default function CodeVerification() {
     const email = localStorage.getItem("reset_email");
 
     const response = await axios.post(
-      `http://localhost:8081/api/v1/user/resendverification`,
+      `${USER_API_END_POINT}/resendverification`,
       { email }
     );
 

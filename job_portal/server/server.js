@@ -25,7 +25,7 @@ app.use(cookieParser())
 
 
 const corsOptions = {
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
     credentials:true,
     exposeHeaders: ['Access-Control-Allow-Credentials'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -59,13 +59,16 @@ app.get('/health', (req, res) => {
 
 const PORT = process.env.PORT || 3000
 
-// Initialize cache and database
+// Initialize cache and database with better error handling
 Promise.all([
     connectDB(),
-    cache.init()
+    cache.init().catch(err => {
+        console.warn('⚠️ Cache initialization failed, continuing without cache:', err.message);
+        return null;
+    })
 ]).then(()=> {
-    app.listen(PORT, ()=> {
-        console.log(`Server is running at PORT: http://localhost:${PORT}`)
+    app.listen(PORT, '0.0.0.0', ()=> {
+        console.log(`Server is running at PORT: ${PORT}`)
         console.log('✅ All systems initialized successfully')
     });
 }).catch(err => {

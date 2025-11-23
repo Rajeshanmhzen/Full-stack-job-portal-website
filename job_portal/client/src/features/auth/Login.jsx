@@ -56,7 +56,7 @@ const [loginError, setLoginError] = useState("");
     try {
       setLoading(true);
       const res = await axios.post(
-        `${USER_API_END_POINT}/user/login`,
+        `${USER_API_END_POINT}/login`,
         data,
         {
           headers: {
@@ -71,7 +71,7 @@ const [loginError, setLoginError] = useState("");
         
         localStorage.setItem("userRole", res.data.user.role);
       
-      const resumeRes = await axios.get(`${RESUME_API_END_POINT}/resume`, {
+      const resumeRes = await axios.get(`${RESUME_API_END_POINT}`, {
         withCredentials: true,
       });
 
@@ -79,7 +79,7 @@ const [loginError, setLoginError] = useState("");
         dispatch(setResume(resumeRes.data.resume));
       }
 
-      const recommendRes = await axios.get("http://localhost:8081/api/v1/resume", {
+      const recommendRes = await axios.get(`${RESUME_API_END_POINT}`, {
         withCredentials: true,
       });
 

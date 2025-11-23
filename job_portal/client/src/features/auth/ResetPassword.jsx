@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios"
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { USER_API_END_POINT } from "../../utils/constant";
 
 export default function ResetPassword() {
      const {token} = useParams()
@@ -53,7 +54,7 @@ export default function ResetPassword() {
 
     try {
       const response = await axios.post(
-        `http://localhost:8081/api/v1/user/resetpassword/${token}`,
+        `${USER_API_END_POINT}/resetpassword/${token}`,
         { password:data.password }
       );
 console.log("from the resetpassword",response.data)
