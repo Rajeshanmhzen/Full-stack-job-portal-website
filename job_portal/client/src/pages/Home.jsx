@@ -71,7 +71,7 @@ const Home = () => {
       <Companies />
       <Dreamjobs />
       <Working />
-    </div>
+    </>
   );
 };
 
