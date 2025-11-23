@@ -3,11 +3,11 @@ import { Carousel } from "@mantine/carousel";
 const Dreamjobs = () => {
   const arr = [1, 2, 3, 4, 5];
   return (
-    <div className="mt-20 pb-5 text-center">
-      <div className="text-4xl text-center font-semibold mb-3">
+    <div className=" mt-20 pb-5 px-10 text-center">
+      <div className="text-3xl md:text-4xl text-center font-semibold mb-3">
         Browse <span className="text-purple-heart-500">Job</span> Category
       </div>
-      <div className="text-mine-shaft-300 w-1/2 mx-auto">
+      <div className=" sm:w-full text-mine-shaft-300 md:w-1/2 mx-auto">
         Explore diverse job opportunities tailored to your skills. Start your
         career journey today!
       </div>

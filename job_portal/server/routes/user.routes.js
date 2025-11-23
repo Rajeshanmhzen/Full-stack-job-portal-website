@@ -11,10 +11,13 @@ import {
   changePassword,
   getUserDetail,
   updateProfile,
+  searchUsers,
+  getUserProfile,
 } from "../controllers/user/user.controller.js";
 
 import Authtoken from "../middleware/authtoken.js";
-import { singleupload } from "../middleware/multer.js";
+import { uploadUserProfile } from "../middleware/fileUpload.js";
+
 
 const router = express.Router();
 
@@ -23,12 +26,14 @@ router.post("/register", register);
 router.post("/login", login);
 router.get("/logout", logout);
 router.post("/change-password", Authtoken, changePassword);
-router.get("/user-detail", Authtoken, getUserDetail);
-router.post("/update-profile", singleupload, Authtoken, updateProfile);
+router.get("/profile", Authtoken, getUserDetail);
+router.post("/update-profile", uploadUserProfile.single("profilePic"), Authtoken, updateProfile);
 router.post("/forget-password", forgetPassword);
 router.post("/verify-reset/:token", verifyResetOTP);
 router.post("/resetpassword/:token", resetPassword);
 router.post("/resendverification", resendVerification);
 router.get("/verify", verifyEmail);
+router.get("/search", searchUsers);
+router.get("/profile/:userId", getUserProfile);
 
 export default router;

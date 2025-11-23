@@ -1,40 +1,35 @@
-// src/routes/index.jsx
-
 import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
-
-// Public Pages
-import Home from "../pages/Home";
-import Login from "../pages/Login";
-import Register from "../pages/Register";
-import ForgotPassword from "../pages/Forgetpassword";
-import CodeVerification from "../pages/CodeVerification";
-import ResetPassword from "../pages/Resetpassword";
-
-// Protected Pages (Role & Auth)
-import ChangePassword from "../pages/profile/ChangePassword";
-import JobHistory from "../pages/profile/JobHistory";
-import FindTalent from "../pages/FindTalent";
-
-// Route Guards
-import ProtectedRoute from "../Components/ProtectedRoute";
-import RoleProtectedRoute from "../Components/RoleProtectedRoute";
-import PostJobForm from "../Components/ui/PostJobForm";
+import Home from "../pages/Home"
+import Error from "../pages/Error"
+import CodeVerification from "../pages/CodeVerification"
+import FindTalent from "../pages/FindTalent"
+import Jobs from "../pages/Jobs"
+import Login from "../features/auth/Login"
+import Register from "../features/auth/Register"
+import ForgotPassword from "../features/auth/ForgetPassword"
+import ResetPassword from "../features/auth/ResetPassword"
+import CompanyCreate from "../features/companies/CompanyCreate"
+import CompanyDetail from "../features/companies/CompanyDetail"
+import AddCompanyDetails from "../features/companies/AddCompanyDetails"
+import JobDetails from "../features/jobs/JobDetails"
+import Recommendation from "../features/jobs/Recommendation"
+import PostJobForm from "../features/jobs/PostJobForm"
+import ChangePassword from "../features/users/ChangePassword"
+import JobHistory from "../features/users/JobHistory"
+import UserProfile from "../features/users/ViewProfile"
+import ProtectedRoute from "./ProtectedRoute";
+import Profile from "../features/users/Profile";
+import RoleProtectedRoute from "./RoleBasedRoute"
 import Company from "../pages/Company";
-import CompanyDetail from "../Components/ui/CompanyDetail";
-import CompanyCreate from "../Components/ui/CompanyCreate";
-import AddCompanyDetails from "../Components/ui/AddCompanyDetails";
-import Jobs from "../pages/Jobs";
-import ResumeUpload from "../Components/ui/ResumeUpload";
-import Recommendation from "../Components/ui/Recommendation";
-import Error from "../pages/Error";
+import UploadResume from "../pages/UploadResume";
+import PublicProfile from "../features/users/PublicProfile";
+import UserSearch from "../features/users/UserSearch";
 
-// Fallback for route errors
-// const RouteError = () => (
-//   <div className="text-center mt-10 text-red-600 text-lg font-semibold">
-//     ⚠️ Something went wrong while loading this page.
-//   </div>
-// );
+import ApplicationManagement from "../features/applications/ApplicationManagement";
+import ApplicationDetails from "../features/applications/ApplicationDetails";
+import Recommendations from "../pages/Recommendations";
+
 
 const router = createBrowserRouter([
   {
@@ -45,17 +40,22 @@ const router = createBrowserRouter([
       //  Public routes
       { index: true, element: <Home /> },
       { path: "jobs", element: <Jobs /> },
+      { path: "search-users", element: <UserSearch /> },
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
       { path: "forgot-password", element: <ForgotPassword /> },
       { path: "verify-reset/:token", element: <CodeVerification /> },
       { path: "reset-password/:token", element: <ResetPassword /> },
+      { path: "profile/:userId", element: <PublicProfile /> },
 
       //  Authenticated user route (any role)
       {
         element: <ProtectedRoute />, 
         children: [
           { path: "user/change-password", element: <ChangePassword /> },
+          { path: "user/view-profile", element: <UserProfile /> },
+          { path: "user/profile", element: <Profile /> },
+
         ],
       },
 
@@ -65,6 +65,8 @@ const router = createBrowserRouter([
         children: [
           { path: "find-talent", element: <FindTalent /> },
           { path: "post-job", element: <PostJobForm /> },
+          { path: "applications", element: <ApplicationManagement /> },
+          { path: "applications/:applicationId", element: <ApplicationDetails /> },
          {
   path: "company",
   children: [
@@ -82,8 +84,9 @@ const router = createBrowserRouter([
         element: <RoleProtectedRoute allowedRoles={["worker"]} />,
         children: [
           { path: "user/job-history", element: <JobHistory /> },
-          { path: "user/upload-resume", element: <ResumeUpload /> },
-          { path: "user/recommendation", element: <Recommendation /> },
+          { path: "user/upload-resume", element: <UploadResume /> },
+          { path: "recommendations", element: <Recommendations /> },
+          { path: "job/:id", element: <JobDetails /> },
         ],
       },
 

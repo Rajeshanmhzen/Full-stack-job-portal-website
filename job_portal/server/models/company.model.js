@@ -24,6 +24,13 @@ const companySchema =  new mongoose.Schema({
         ref: "User",
         required: true
     }
-}, {timestamps:true})
+}, {timestamps:true});
 
-export const Company = mongoose.model("Company", companySchema)
+// Add indexes for better performance
+companySchema.index({ name: "text", description: "text" });
+companySchema.index({ name: 1 });
+companySchema.index({ location: 1 });
+companySchema.index({ userId: 1 });
+
+const Company = mongoose.model("Company", companySchema);
+export { Company };

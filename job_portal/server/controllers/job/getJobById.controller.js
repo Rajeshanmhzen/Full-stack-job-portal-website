@@ -1,10 +1,10 @@
-import { Job } from "../../models/job.model.js"
+import  Job  from "../../models/job.model.js"
 
 // worker
 export const getJobById = async(req,res)=> {
     try {
         const jobId = req.params.id;
-        const job = await Job.findById(jobId);
+        const job = await Job.findById(jobId).populate('company');
         if(!job) {
             throw new Error ("Job not Found!")
         }

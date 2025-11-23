@@ -71,7 +71,6 @@ export default function CodeVerification() {
       const newToken = response.data.token;
       localStorage.setItem("reset_token", newToken);
 
-      // ✅ Corrected: update router state
       navigate(`/verify-reset/${newToken}`, { replace: true });
     }
 

@@ -1,5 +1,5 @@
-import { Resume } from "../../models/resume.js";
-import { Job } from "../../models/job.model.js";
+import  {Resume } from "../../models/resume.js";
+import  Job  from "../../models/job.model.js";
 import { 
   extractDetail, 
   extractTextFromDocx, 
@@ -11,6 +11,7 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
 import { Recommendation } from "../../models/recommendation.model.js";
+import { createNotification } from "../notification/notification.controller.js";
 
 
 export const uploadResume = async (req, res) => {
@@ -61,7 +62,7 @@ export const uploadResume = async (req, res) => {
       const oldFilePath = path.join(__dirname, '../../uploads/resumes', oldResume.filename);
 
       if (fs.existsSync(oldFilePath)) {
-        fs.unlinkSync(oldFilePath); // delete old resume file
+        fs.unlinkSync(oldFilePath); 
       }
     }
 
@@ -83,7 +84,8 @@ export const uploadResume = async (req, res) => {
 
     // Get fresh job recommendations
     const recommendations = await getJobRecommendations(updatedResume);
-
+    await Recommendation.deleteMany({ user: userId, resume: updatedResume._id });
+    
     for(const r of recommendations) {
       await Recommendation.create({
         user:userId,
@@ -92,6 +94,13 @@ export const uploadResume = async (req, res) => {
         score:r.score,
         matchingReason:r.matchingReason
       })
+    }
+    
+    if(recommendations.length > 0) {
+      await createNotification(
+        userId, 
+        `Resume updated! Found. New job recommendations based on your profile.`
+      );
     }
     
     res.status(200).json({
@@ -111,12 +120,10 @@ export const uploadResume = async (req, res) => {
     });
   }
 };
-
-// Get job recommendations based on a resume
 export const getJobRecommendations = async (resumeData) => {
   try {
     // Find all available jobs
-    const jobs = await Job.find();
+    const jobs = await Job.find().populate('company', 'name logo');;
     const scoredJobs = [];
     
     // Get job titles from resume for quick matching
@@ -124,6 +131,7 @@ export const getJobRecommendations = async (resumeData) => {
     const resumeSkills = resumeData.skills.map(skill => skill.toLowerCase());
     
     for (const job of jobs) {
+      console.log("company info:", job.company); 
       let score = 0;
       const jobTitle = job.title.toLowerCase();
       const jobLocation = job.location.toLowerCase();
@@ -154,11 +162,10 @@ export const getJobRecommendations = async (resumeData) => {
         score += (matchingSkills.length / Math.max(resumeSkills.length, jobSkills.length)) * 20;
       }
       
-      // Content similarity (as a fallback)
       const contentSimilarity = calculateSimilarity(resumeData.content, job.description);
       score += contentSimilarity * 10;
       
-      // Normalize score to 0-100 range
+
       score = Math.min(Math.round(score), 100);
       
       scoredJobs.push({
@@ -168,18 +175,15 @@ export const getJobRecommendations = async (resumeData) => {
       });
     }
     
-    // Sort by score descending
     scoredJobs.sort((a, b) => b.score - a.score);
     
-    // Return top 10 recommendations
+
     return scoredJobs.slice(0, 10);
   } catch (error) {
     console.error("Error getting job recommendations:", error);
     return [];
   }
 };
-
-// Generate a human-readable reason for the match
 const getMatchingReason = (score, resumeTitles, jobTitle, resumeSkills, jobSkills) => {
   if (score < 20) return "Low match based on general profile";
   
@@ -206,15 +210,12 @@ const getMatchingReason = (score, resumeTitles, jobTitle, resumeSkills, jobSkill
     }
   }
   
-  // If no specific reason found
   if (reasons.length === 0) {
     reasons.push("Your overall profile matches this position");
   }
   
   return reasons.join(". ");
 };
-
-// Keyword search functionality
 export const keywordSearch = async (req, res) => {
   try {
     const { keyword } = req.query;
@@ -226,7 +227,6 @@ export const keywordSearch = async (req, res) => {
       });
     }
     
-    // Find resumes that contain the keyword
     const resumes = await Resume.find({
       $or: [
         { content: { $regex: keyword, $options: 'i' } },
@@ -237,16 +237,12 @@ export const keywordSearch = async (req, res) => {
       ]
     });
     
-    // Simple manual ranking without NLP libraries
     const scoredResumes = resumes.map(resume => {
-      // Count occurrences of keyword
       const keywordRegex = new RegExp(keyword, 'gi');
       const contentMatches = (resume.content.match(keywordRegex) || []).length;
       
-      // Check if keyword matches important fields exactly
       let score = contentMatches; 
       
-      // Add points for exact matches in important fields
       if (resume.name.toLowerCase().includes(keyword.toLowerCase())) score += 10;
       if (resume.location.toLowerCase().includes(keyword.toLowerCase())) score += 5;
       if (resume.jobTitles.some(title => title.toLowerCase().includes(keyword.toLowerCase()))) score += 8;
@@ -273,7 +269,6 @@ export const keywordSearch = async (req, res) => {
     });
   }
 };
-
 export const getAllResumes = async (req, res) => {
   try {
     const resumes = await Resume.find();
@@ -292,15 +287,13 @@ export const getAllResumes = async (req, res) => {
     });
   }
 };
-
-// Get resumes by specific user ID
 export const getResumesByUserID = async (req, res) => {
   try {
     const userId = req.id;
 
-    const userResumes = await Resume.find({ user: userId });
+    const userResumes = await Resume.findOne({ user: userId });
 
-    if (userResumes.length === 0) {
+    if (!userResumes) {
       return res.status(404).json({
         message: "No resumes found for this user",
         error: true,
@@ -309,8 +302,7 @@ export const getResumesByUserID = async (req, res) => {
     }
 
     res.status(200).json({
-      resumes: userResumes,
-      count: userResumes.length,
+      resume: userResumes,
       success: true,
       error: false
     });
@@ -324,7 +316,6 @@ export const getResumesByUserID = async (req, res) => {
     });
   }
 };
-
 export const downloadResume = async (req, res) => {
   try {
     const resume = await Resume.findOne({ user: req.id });
@@ -357,5 +348,36 @@ export const downloadResume = async (req, res) => {
       success: false,
       error: true
     });
+  }
+};
+export const getUserRecommendations = async (req, res) => {
+  try {
+    const recs = await Recommendation.find({ user: req.id })
+      .populate({
+        path: "job",
+        populate: {
+          path: "company",
+          select: "name logo"
+        }
+      })
+      .sort({ score: -1 })
+      .limit(10);
+
+    // Filter out recommendations where job is null (deleted jobs)
+    const validRecs = recs.filter(rec => rec.job && rec.job._id);
+    
+    // Clean up invalid recommendations from database
+    const invalidRecs = recs.filter(rec => !rec.job || !rec.job._id);
+    if (invalidRecs.length > 0) {
+      await Recommendation.deleteMany({ 
+        _id: { $in: invalidRecs.map(rec => rec._id) } 
+      });
+    }
+
+    console.log("Valid recommendations found:", validRecs.length);
+    res.status(200).json({ success: true, recommendations: validRecs });
+  } catch (err) {
+    console.error("Error fetching recommendations:", err);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };

@@ -11,11 +11,12 @@ const AuthLoader = ({ children }) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get(`${USER_API_END_POINT}/user/user-detail`, {
+        const res = await axios.get(`${USER_API_END_POINT}/user/profile`, {
           withCredentials: true,
         });
         dispatch(setUser(res.data.user));
       } catch (err) {
+        console.log(err);
         dispatch(clearUser());
       }
     };

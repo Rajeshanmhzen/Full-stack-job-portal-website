@@ -7,12 +7,12 @@ import companySlice from "./companySlice";
 import resumeSlice from "./resumeSlice";
 import applicationSlice from "./applicationSlice";
 import savedJobSlice from './savedJobSlice';
-
+import notificationSlice from "./notificationSlice"
 // Persist configuration
 const persistConfig = {
     key: 'root',
     storage,
-    whitelist: ['user', 'resume', 'job', 'application', 'company', 'savedJob'] 
+    whitelist: ['user', 'resume', 'job', 'application', 'company', 'savedJob', 'notification'] 
 };
 
 const rootReducer = combineReducers({
@@ -22,6 +22,7 @@ const rootReducer = combineReducers({
     company: companySlice,
     application: applicationSlice,
     savedJob : savedJobSlice,
+    notification:notificationSlice,
 });
 
 // Create persisted reducer

@@ -13,8 +13,8 @@ applicant: {
 },
 status: {
     type:String,
-    enum: ['pending', 'reviewing', 'interviewed', 'rejected', 'offered', 'hired', "inProgress"],
-    default:'pending'
+    enum: ['applied', 'pending', 'reviewing', 'interviewed', 'rejected', 'offered', 'hired', "inProgress"],
+    default:'applied'
 }
 }, {timestamps:true})
 

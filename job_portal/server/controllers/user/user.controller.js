@@ -1,181 +1,181 @@
-import User from "../../models/user.model.js"
-import bcrypt from "bcryptjs"
-import jwt from "jsonwebtoken"
-import Token from '../../models/token.model.js'
-import crypto from "crypto"
-import emailSender  from '../../middleware/emailSender.js'
+import User from "../../models/user.model.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import Token from "../../models/token.model.js";
+import crypto from "crypto";
+import emailSender from "../../middleware/emailSender.js";
+import { createNotification } from "../notification/notification.controller.js";
 
 export const register = async (req, res) => {
   try {
-         const {fullname, email, password, role} = req.body;
- 
-         const user = await User.findOne({email})
- 
-         if(user){
-             throw new Error("Already user exits.")
-         }
- 
-         if(!email){
-            throw new Error("Please provide email")
-         }
-         if(!password){
-             throw new Error("Please provide password")
-        }
-        if(password.length < 7) {
-            throw new Error("password mus contain atleast 7 char")
-        }
-         if(!fullname){
-             throw new Error("Please provide fullname")
-         }
-         if(!role){
-             throw new Error("Please provide role")
-         }
- 
-         const salt = bcrypt.genSaltSync(10);
-         const hashPassword = await bcrypt.hashSync(password, salt);
- 
-         if(!hashPassword){    
-             throw new Error("Something is wrong")
-         }
- 
-         const payload = {
-             ...req.body,
-             password : hashPassword
-         }
- 
-         const userData = new User(payload)
-         const saveUser = await userData.save();
-         saveUser.password = undefined
- 
-         res.status(201).json({
-             data : saveUser,
-             success : true,
-             error : false,
-             message : "User created Successfully!"
-         })
-     } catch(err){
-         res.json({
-             message : err.message || err  ,
-             error : true,
-             success : false,
-         })
-     }
+    const { fullname, email, password, role } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (user) {
+      throw new Error("Already user exits.");
+    }
+
+    if (!email) {
+      throw new Error("Please provide email");
+    }
+    if (!password) {
+      throw new Error("Please provide password");
+    }
+    if (password.length < 7) {
+      throw new Error("password mus contain atleast 7 char");
+    }
+    if (!fullname) {
+      throw new Error("Please provide fullname");
+    }
+    if (!role) {
+      throw new Error("Please provide role");
+    }
+
+    const salt = bcrypt.genSaltSync(10);
+    const hashPassword = await bcrypt.hashSync(password, salt);
+
+    if (!hashPassword) {
+      throw new Error("Something is wrong");
+    }
+
+    const payload = {
+      ...req.body,
+      password: hashPassword,
+    };
+
+    const userData = new User(payload);
+    const saveUser = await userData.save();
+    saveUser.password = undefined;
+
+    res.status(201).json({
+      data: saveUser,
+      success: true,
+      error: false,
+      message: "User created Successfully!",
+    });
+  } catch (err) {
+    res.json({
+      message: err.message || err,
+      error: true,
+      success: false,
+    });
+  }
 };
 export const login = async (req, res) => {
   try {
-      const { email, password, role} = req.body
-  
-          if(!email){
-              throw new Error("Please provide email")
-          }
-          if(!password){
-               throw new Error("Please provide password")
-          }
-          if(!role){
-              throw new Error("Please provide role")
-         }
-          if(password.length < 7) {
-              throw new Error("password mus contain atleast 7 char")
-          }
-  
-          let user = await User.findOne({email})
-  
-         if(!user){
-              throw new Error("User not found")
-         }
-         if(role !== user.role) {
-          throw new Error("Account doesn't exists with this current role")
-         }
-  
-         if(user.lockUntil && user.lockUntil > Date.now()) {
-          const remainingTime = (user.lockUntil - Date.now()) / 1000; // remaining lock time in seconds
-          return res.status(400).json({ 
-              message: `Account is locked. Please try again in ${Math.ceil(remainingTime)} seconds.`,
-              success: false
-          });
+    const { email, password, role } = req.body;
+
+    if (!email) {
+      throw new Error("Please provide email");
+    }
+    if (!password) {
+      throw new Error("Please provide password");
+    }
+    if (!role) {
+      throw new Error("Please provide role");
+    }
+    if (password.length < 7) {
+      throw new Error("password mus contain atleast 7 char");
+    }
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+    if (role !== user.role) {
+      throw new Error("Account doesn't exists with this current role");
+    }
+
+    if (user.lockUntil && user.lockUntil > Date.now()) {
+      const remainingTime = (user.lockUntil - Date.now()) / 1000; // remaining lock time in seconds
+      return res.status(400).json({
+        message: `Account is locked. Please try again in ${Math.ceil(
+          remainingTime
+        )} seconds.`,
+        success: false,
+      });
+    }
+
+    const checkPassword = await bcrypt.compare(password, user.password);
+
+    if (checkPassword) {
+      // Reset failedAttempts and lockUntil after successful login
+      user.failedAttempts = 0;
+      user.lockUntil = null;
+
+      // Save the updated user record
+      await user.save();
+
+      const tokenData = {
+        userId: user._id,
+        email: user.email,
+        verifed: user.verified,
+        role: user.role,
+      };
+
+      const token = await jwt.sign(tokenData, process.env.TOKEN_SECRET_KEY, {
+        expiresIn: "1d",
+      });
+
+      user = {
+        _id: user._id,
+        fullname: user.fullname,
+        email: user.email,
+        role: user.role,
+        profilePic: user.profilePic,
+      };
+
+      res
+        .cookie("token", token, {
+          maxAge: 1 * 24 * 60 * 60 * 1000,
+          httpsOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+        })
+        .status(200)
+        .json({
+          message: `Welcome back ${user.fullname}`,
+          user,
+          success: true,
+          error: false,
+        });
+
+      return;
+    } else {
+      user.failedAttempts += 1;
+
+      // const lockTimes = [30, 3 * 60, 5 * 60, 10 * 60];
+      const lockTimes = [1, 5]; //this is for the testing to show the implement of locktime
+      const maxAttempts = lockTimes.length;
+
+      let lockTime = 0;
+
+      for (let i = 0; i < maxAttempts; i++) {
+        if (user.failedAttempts <= (i + 1) * 3) {
+          lockTime = lockTimes[i];
+          break;
+        }
       }
-  
-         const checkPassword = await bcrypt.compare(password,user.password)
-  
-         if(checkPassword) {
-           // Reset failedAttempts and lockUntil after successful login
-           user.failedAttempts = 0;
-           user.lockUntil = null;
-   
-           // Save the updated user record
-           await user.save();
-  
-          const tokenData = {
-              userId : user._id,
-              email:user.email,
-              verifed:user.verified,
-              role:user.role
-          }
-  
-          const token =  await jwt.sign(tokenData, process.env.TOKEN_SECRET_KEY, { expiresIn: '1d'});
-  
-          user = {
-              _id: user._id,
-              fullname: user.fullname,
-              email: user.email,
-              phoneNumber: user.phoneNumber,
-              role: user.role,
-              profile: user.profile
-          }
-  
-          res.cookie("token", token, {
-              maxAge: 1 * 24 * 60 * 60 * 1000,
-              httpsOnly: true,
-              secure: process.env.NODE_ENV === "production",
-              sameSite: 'strict'
-          }).status(200).json({
-              message: `Welcome back ${user.fullname}`,
-              user,
-              success: true,
-              error: false,
-          });
-  
-         
-  
-          return; 
-         
-        
-  
-      }else {
-          user.failedAttempts += 1;
-  
-          // const lockTimes = [30, 3 * 60, 5 * 60, 10 * 60]; 
-           const lockTimes = [1,  5];  //this is for the testing to show the implement of locktime
-          const maxAttempts = lockTimes.length; 
-  
-          let lockTime = 0;
-  
-          for (let i = 0; i < maxAttempts; i++) {
-              if (user.failedAttempts <= (i + 1) * 3) {
-                  lockTime = lockTimes[i];
-                  break;
-              }
-          }
-  
-          if (user.failedAttempts > maxAttempts * 3) {
-              lockTime = lockTimes[maxAttempts - 1]; // After 12 attempts, use the max lock time
-          }
-  
-          // Apply lock time based on failed attempts
-          if (lockTime > 0) {
-              user.lockUntil = Date.now() + lockTime * 1000; // Lock until updated
-          }
-  
-          await user.save();
-  
-          return res.status(400).json({ 
-              message: `Incorrect password. Attempt ${user.failedAttempts}/3. Please try again after the lock period ${lockTime}s.`,
-              success: false 
-          });
-  
+
+      if (user.failedAttempts > maxAttempts * 3) {
+        lockTime = lockTimes[maxAttempts - 1]; // After 12 attempts, use the max lock time
       }
-         
-     } catch (err) {
+
+      // Apply lock time based on failed attempts
+      if (lockTime > 0) {
+        user.lockUntil = Date.now() + lockTime * 1000; // Lock until updated
+      }
+
+      await user.save();
+
+      return res.status(400).json({
+        message: `Incorrect password. Attempt ${user.failedAttempts}/3. Please try again after the lock period ${lockTime}s.`,
+        success: false,
+      });
+    }
+  } catch (err) {
     res.json({
       message: err.message || err,
       error: true,
@@ -232,9 +232,10 @@ export const forgetPassword = async (req, res) => {
     <p>This link/code will expire in 10 minutes.</p>
         `,
   });
-  res.send({ message: "password reset link has been sent to you your email.",
-    "token":tokenObj.token
-   });
+  res.send({
+    message: "password reset link has been sent to you your email.",
+    token: tokenObj.token,
+  });
 };
 export const verifyResetOTP = async (req, res) => {
   const { token } = req.params;
@@ -283,7 +284,7 @@ export const resendVerification = async (req, res) => {
     return res.status(400).json({ error: "user is already verified" });
   }
   await Token.deleteMany({ user: user._id });
-const otpCode = Math.floor(100000 + Math.random() * 900000)
+  const otpCode = Math.floor(100000 + Math.random() * 900000);
   let tokenObj = await Token.create({
     token: crypto.randomBytes(16).toString("hex"),
     otp: otpCode.toString(),
@@ -305,34 +306,34 @@ const otpCode = Math.floor(100000 + Math.random() * 900000)
     <p>This link/code will expire in 10 minutes.</p>
         `,
   });
-  res.send({ 
+  res.send({
     message: "verification link has been send to your email",
-    "token":tokenObj.token
-   });
+    token: tokenObj.token,
+  });
 };
-export const getUserDetail = async(req,res)=> {
+export const getUserDetail = async (req, res) => {
   try {
-     const userId = req.id; 
+    const userId = req.id;
 
-    const user = await User.findById(userId).select('-password');
+    const user = await User.findById(userId).select("-password");
 
     if (!user) {
       return res.status(404).json({
-        message: 'User not found',
+        message: "User not found",
         error: true,
         success: false,
       });
     }
 
     res.status(200).json({
-      message: 'User retrieved successfully',
-       user,
+      message: "User retrieved successfully",
+      user,
       error: false,
       success: true,
     });
   } catch (err) {
     res.status(400).json({
-      message: err.message || err,
+      message: "NO user Found with this Id" || err,
       error: true,
       success: false,
     });
@@ -340,7 +341,7 @@ export const getUserDetail = async(req,res)=> {
 };
 export const changePassword = async (req, res) => {
   try {
-    const userId = req.id; 
+    const userId = req.id;
     const { currentPassword, newPassword } = req.body;
 
     if (!currentPassword || !newPassword) {
@@ -380,19 +381,23 @@ export const changePassword = async (req, res) => {
     }
 
     const salt = await bcrypt.genSalt(10);
-    const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-    user.password = hashedNewPassword;
+    user.password = hashedPassword;
     await user.save();
 
-    res.status(200).json({
+    await createNotification(userId, "Your password was changed successfully.");
+
+    return res.status(200).json({
       message: "Password changed successfully.",
       success: true,
       error: false,
     });
+
   } catch (err) {
-    res.status(500).json({
-      message: err.message || "Internal Server Error",
+    console.error("Password change error:", err.message);
+    return res.status(500).json({
+      message: "Internal server error.",
       success: false,
       error: true,
     });
@@ -400,57 +405,183 @@ export const changePassword = async (req, res) => {
 };
 export const logout = async (req, res) => {
   res.clearCookie("token");
-  res.send({ message: "Logout successfully",success:true, error:false });
+  res.send({ message: "Logout successfully", success: true, error: false });
 };
-export const updateProfile = async(req, res) => {
-    try {
-        const { fullname, email, phoneNumber, bio, skills } = req.body;
-        
-        let skillsArray;
-        if(skills){
-            skillsArray = skills.split(",");
-        }
-        const userId = req.id; // middleware authentication
-        let user = await User.findById(userId);
+export const updateProfile = async (req, res) => {
+  try {
+    const { fullname, email, location, skills, experienceYears, experience, certifications } = req.body;
+    const userId = req.id;
 
-        if (!user) {
-            return res.status(400).json({
-                message: "User not found.",
-                success: false
-            })
-        }
+    let user = await User.findById(userId);
+    if (!user) {
+      return res.status(400).json({ message: "User not found.", success: false });
+    }
 
-         // updating data
-         if(fullname) user.fullname = fullname
-         if(email) user.email = email
-         if(phoneNumber)  user.phoneNumber = phoneNumber
-         if(bio) user.profile.bio = bio
-         if(skills) user.profile.skills = skillsArray
+    if (fullname) user.fullname = fullname;
+    if (email) user.email = email;
+    if (location) user.location = location;
+    if (skills) user.skills = Array.isArray(skills) ? skills : skills.split(",");
+    if (experienceYears) user.experienceYears = parseInt(experienceYears);
+    if (experience) user.experience = typeof experience === 'string' ? JSON.parse(experience) : experience;
+    if (certifications) user.certifications = typeof certifications === 'string' ? JSON.parse(certifications) : certifications;
+    if (req.file) user.profilePic = req.file.filename;
 
-         await user.save();
+    await user.save();
+    await createNotification(userId, "Your profile was updated successfully");
+    
+    res.status(200).json({
+      message: "Profile updated successfully.",
+      user: {
+        _id: user._id,
+        fullname: user.fullname,
+        email: user.email,
+        role: user.role,
+        location: user.location,
+        skills: user.skills,
+        experienceYears: user.experienceYears,
+        profilePic: user.profilePic,
+        experience: user.experience,
+        certifications: user.certifications
+      },
+      success: true,
+      error: false
+    });
+  } catch (err) {
+    console.error("Profile update error:", err.message);
+    res.status(500).json({
+      message: "Internal server error.",
+      success: false,
+      error: true
+    });
+  }
+};
+export const searchCandidates = async (req, res) => {
+  const {
+    q = "",
+    name = "",
+    location = "",
+    minExperience,
+    maxExperience,
+    page = 1,
+    limit = 20,
+    sort = "-createdAt",
+  } = req.query;
 
-        user = {
-            _id: user._id,
-            fullname: user.fullname,
-            email: user.email,
-            phoneNumber: user.phoneNumber,
-            role: user.role,
-            profile: user.profile
-        }
+  // Start filter with fixed role
+  const filter = { role: "worker" };
 
-        return res.status(200).json({
-            message:"Profile updated successfully.",
-            user,
-            success:true
-        })
+  if (q) filter.$text = { $search: q };
 
-      } catch (err) {
-        res.status(500).json({
-          message: err.message || "Error updating user information",
-          error: true,
-          success: false,
-        });
-      }
-}
+  // 🔑 NAME SEARCH (partial, case‑insensitive)
+  if (name) {
+    const cleanName = name.trim();
+    if (cleanName.length) filter.fullname = new RegExp(cleanName, "i");
+  }
 
+  if (location) filter.location = new RegExp(location.trim(), "i");
+  if (minExperience) filter.experienceYears = {
+    ...filter.experienceYears,
+    $gte: +minExperience,
+  };
+  if (maxExperience) filter.experienceYears = {
+    ...filter.experienceYears,
+    $lte: +maxExperience,
+  };
 
+  const pageNumber = parseInt(page) || 1;
+  const limitNumber = parseInt(limit) || 20;
+
+  try {
+    const users = await User.find(filter)
+      .sort(sort)
+      .skip((pageNumber - 1) * limitNumber)
+      .limit(limitNumber);
+
+    const total = await User.countDocuments(filter);
+
+    res.json({
+      candidates: users,
+      total,
+      page: pageNumber,
+      pages: Math.ceil(total / limitNumber),
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+};
+export const searchUsers = async (req, res) => {
+  try {
+    const { q, role, location, page = 1, limit = 10 } = req.query;
+    
+    if (!q || q.length < 2) {
+      return res.json({ success: true, users: [], total: 0 });
+    }
+
+    const searchQuery = {
+      $and: [
+        {
+          $or: [
+            { fullname: { $regex: q, $options: 'i' } },
+            { skills: { $regex: q, $options: 'i' } },
+            { location: { $regex: q, $options: 'i' } }
+          ]
+        },
+        role && { role },
+        location && { location: { $regex: location, $options: 'i' } },
+        { isVerified: true }
+      ].filter(Boolean)
+    };
+
+    const [users, total] = await Promise.all([
+      User.find(searchQuery)
+        .select('fullname email role profilePic location skills experienceYears')
+        .skip((page - 1) * limit)
+        .limit(parseInt(limit))
+        .sort({ fullname: 1 }),
+      User.countDocuments(searchQuery)
+    ]);
+
+    res.json({
+      success: true,
+      users,
+      total,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / limit)
+    });
+  } catch (error) {
+    console.error('Error searching users:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error searching users'
+    });
+  }
+};
+
+export const getUserProfile = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    const user = await User.findById(userId)
+      .select('-password -failedAttempts -lockUntil')
+      .populate('resume', 'skills experience education');
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      user
+    });
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching user profile'
+    });
+  }
+};

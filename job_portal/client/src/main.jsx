@@ -34,7 +34,7 @@ createRoot(document.getElementById('root')).render(
     <Provider store={store}>
       <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
      <MantineProvider defaultColorScheme='dark' theme={theme}>
-      <Notifications position='top-right'/>
+      <Notifications position='bottom-right'/>
       <AuthLoader>
       <RouterProvider router={router} />
       </AuthLoader>

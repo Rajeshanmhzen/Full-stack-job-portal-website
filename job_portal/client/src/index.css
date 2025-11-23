@@ -71,6 +71,46 @@
     color:var(--color-mine-shaft-50) ;
 }
 
+/* Theme variables */
+.dark {
+    --bg-primary: var(--color-mine-shaft-900);
+    --bg-secondary: var(--color-mine-shaft-800);
+    --bg-card: var(--color-mine-shaft-800);
+    --text-primary: var(--color-mine-shaft-50);
+    --text-secondary: var(--color-mine-shaft-300);
+    --border-color: var(--color-mine-shaft-700);
+    --header-bg: var(--color-mine-shaft-900);
+}
+
+.light {
+    --bg-primary: #f8fafc;
+    --bg-secondary: #ffffff;
+    --bg-card: #ffffff;
+    --text-primary: var(--color-mine-shaft-900);
+    --text-secondary: var(--color-mine-shaft-600);
+    --border-color: #e2e8f0;
+    --header-bg: #ffffff;
+}
+
+.theme-bg {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+.theme-card {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.theme-header {
+    background-color: var(--header-bg);
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
 /* form page */
 form .form-lists {
   display: flex;

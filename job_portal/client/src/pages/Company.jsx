@@ -1,7 +1,7 @@
 import { Button, Input } from '@mantine/core'
 import { useEffect, useState } from 'react';
 import { IoClose, IoLaptop } from "react-icons/io5";
-import CompanyList from '../Components/ui/CompanyList';
+import CompanyList from '../features/companies/CompanyList';
 import axios from 'axios';
 import { COMPANY_API_END_POINT } from '../utils/constant';
 import { useNavigate } from 'react-router-dom';

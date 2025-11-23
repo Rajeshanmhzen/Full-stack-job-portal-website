@@ -1,6 +1,6 @@
 import { Application } from "../../models/application.model.js";
 import { SavedJob } from "../../models/savedJob.model.js";
-import { Job } from "../../models/job.model.js";
+import  Job  from "../../models/job.model.js";
 // Get user's applied jobs
 export const getAppliedJobs = async (req, res) => {
     try {

@@ -81,6 +81,18 @@ export const extractDetail = (text, filename) => {
   const experienceRegex = /\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[\s.-]*\d{4}\s*[-–—to]+\s*(?:Present|\w{3,9}\s\d{4}|\d{4})/gi;
   const experience = [...cleanText.matchAll(experienceRegex)].map(m => m[0]);
 
+  // objective
+  let objective = "";
+const objectiveStart = lines.findIndex(line => /^Objective$/i.test(line));
+if (objectiveStart !== -1) {
+  for (let i = objectiveStart + 1; i < lines.length; i++) {
+    const line = lines[i];
+    if (/^(Experience|Education|Skills|Projects|Certifications)$/i.test(line)) break;
+    objective += line + " ";
+  }
+  objective = objective.trim();
+}
+
   // 9.project
   const projectStart = lines.findIndex(line => /^Projects$/i.test(line));
   let rawProjects = [];
@@ -98,6 +110,7 @@ export const extractDetail = (text, filename) => {
   return {
     filename,
     content:text,
+    objective,
     name,
     email,
     phone,
@@ -109,7 +122,6 @@ export const extractDetail = (text, filename) => {
     projects,
   };
 };
-
 
 // Simple Jaccard Similarity
 export const calculateSimilarity = (text1, text2) => {

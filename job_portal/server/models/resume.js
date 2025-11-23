@@ -13,6 +13,7 @@ const resumeSchema = new mongoose.Schema({
     skills: [String],
     experience: [String],
     projects: [String],
+    objective:String,
     uploadedAt: { type: Date, default: Date.now },
   });
   export const Resume = mongoose.model('Resume', resumeSchema);

@@ -9,7 +9,9 @@ import companyRoute from "./routes/company.route.js"
 import JobRoute  from "./routes/job.route.js"
 import ApplicationRoute  from "./routes/application.route.js"
 import ResumeRoute  from "./routes/resume.route.js"
-
+import searchRoutes from "./routes/search.route.js";
+import noticationsRoute from "./routes/notification.route.js"
+import cache from "./utils/cache.js"
 import dotenv from "dotenv"
 dotenv.config({})
 
@@ -26,7 +28,7 @@ const corsOptions = {
     origin: "http://localhost:5173",
     credentials:true,
     exposeHeaders: ['Access-Control-Allow-Credentials'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }
 app.use(cors(corsOptions))
@@ -47,11 +49,26 @@ app.use("/api/v1/company", companyRoute)
 app.use("/api/v1/job", JobRoute)
 app.use("/api/v1/application", ApplicationRoute)
 app.use("/api/v1/resume", ResumeRoute)
+app.use("/api/search", searchRoutes);
+app.use("/api/v1/notification", noticationsRoute)
 
+// Health check endpoint for testing
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
 
 const PORT = process.env.PORT || 3000
-connectDB().then(()=> {
+
+// Initialize cache and database
+Promise.all([
+    connectDB(),
+    cache.init()
+]).then(()=> {
     app.listen(PORT, ()=> {
         console.log(`Server is running at PORT: http://localhost:${PORT}`)
+        console.log('✅ All systems initialized successfully')
     });
+}).catch(err => {
+    console.error('❌ Failed to initialize server:', err);
+    process.exit(1);
 });

@@ -1,14 +1,18 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useSelector } from "react-redux";
+import getUserRoleFromToken from "../utils/auth";
 
-const RoleBasedRoute = ({ allowedRoles }) => {
-  const user = useSelector((state) => state.user.user);
+const RoleProtectionRoute = ({ allowedRoles }) => {
+  const userRole = getUserRoleFromToken();
 
-  if (!user) {
-    return <Navigate to="/login" replace />;
+   if (!userRole) {
+    return <Navigate to="/" />;
   }
 
-  return allowedRoles.includes(user.role) ? <Outlet /> : <Navigate to="/" replace />;
+  if (!allowedRoles.includes(userRole)) {
+    return <Navigate to="/" />;
+  }
+
+  return <Outlet />;
 };
 
-export default RoleBasedRoute;
+export default RoleProtectionRoute;
